@@ -234,7 +234,8 @@ sub flavors {
   my $detail  = shift;
   my $request = HTTP::Request->new(
     'GET',
-    $self->server_management_url . ((defined $detail && $detail) ? '/flavors/detail' : '/flavors'),
+    $self->server_management_url
+      . ( ( defined $detail && $detail ) ? '/flavors/detail' : '/flavors' ),
     [ 'X-Auth-Token' => $self->token ]
   );
   my $response = $self->_request($request);
@@ -250,12 +251,12 @@ sub flavors {
   return map {
     Net::Mosso::CloudServers::Flavor->new(
       cloudservers => $self,
-      id => $_->{id},
-      name => $_->{name},
-      ram => $_->{ram},
-      disk => $_->{disk},
-    )
-  } @{$hash_response->{flavors}};
+      id           => $_->{id},
+      name         => $_->{name},
+      ram          => $_->{ram},
+      disk         => $_->{disk},
+      )
+  } @{ $hash_response->{flavors} };
 }
 
 sub flavorsdetails {
