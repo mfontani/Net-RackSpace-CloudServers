@@ -14,4 +14,5 @@ my $CS = Net::Mosso::CloudServers->new(
 
 $CS->servers;
 
+$CS->serversdetails;
 

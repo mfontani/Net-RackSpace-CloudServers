@@ -161,6 +161,41 @@ sub servers {
   return @servers;
 }
 
+sub serversdetails {
+  my $self = shift;
+  my $request = HTTP::Request->new(
+    'GET', $self->server_management_url . '/servers/detail',
+    [ 'X-Auth-Token' => $self->token ]
+  );
+  my $response = $self->_request($request);
+  return if $response->code == 204;
+  confess 'Unknown error' if $response->code != 200;
+  my @servers;
+  my $hash_response = from_json( $response->content );
+  warn Dump($hash_response) if $DEBUG;
+  # {"servers":[{"name":"test00","id":12345}]}
+  confess 'response does not contain key "servers"' if (!defined $hash_response->{servers});
+  confess 'response does not contain arrayref of "servers"' if (ref $hash_response->{servers} ne 'ARRAY');
+  my @response_servers = @{ $hash_response->{servers} };
+  foreach my $hserver ( @{ $hash_response->{servers} } ) {
+    #push @servers,
+    #  Net::Mosso::CloudServers::Server->new(
+    #    id        => $hserver->{id},
+    #    name      => $hserver->{name},
+    #    imageid   => $hserver->{imageId},
+    #    flavorid  => $hserver->{flavorId},
+    #    hostid    => $hserver->{hostId},
+    #    status    => $hserver->{status},
+    #    progress  => $hserver->{progress},
+    #    addresses => $hserver->{addresses}, # public: [], private: []
+    #    metadata  => $hserver->{metadata},
+    #  );
+    warn "Name: ", $hserver->{name}, " id: ", $hserver->{id}, ' public IP: ',
+      "@{ $hserver->{addresses}->{public} } " if ($DEBUG);
+  }
+  return @servers;
+}
+
 sub limits {
   my $self = shift;
   my $request = HTTP::Request->new(
