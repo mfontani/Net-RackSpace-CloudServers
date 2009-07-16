@@ -11,8 +11,78 @@ use URI::QueryParam;
 
 our $DEBUG = 0;
 
+has 'user'    => ( is => 'ro', isa => 'Str', required => 1 );
+has 'key'     => ( is => 'ro', isa => 'Str', required => 1 );
+has 'timeout' => ( is => 'ro', isa => 'Num', required => 0, default => 30 );
+has 'ua'      => ( is => 'rw', isa => 'LWP::UserAgent', required => 0 );
+
+has 'server_management_url' => (
+  is => 'rw',
+  isa => 'Str',
+  required => 0,
+);
+has 'storage_url' => (
+  is => 'rw',
+  isa => 'Str',
+  required => 0,
+);
+has 'cdn_management_url' => ( is => 'rw', isa => 'Str',            required => 0 );
+has 'token'       => ( is => 'rw', isa => 'Str',            required => 0 );
+
+
 no Moose;
 __PACKAGE__->meta->make_immutable();
+
+# copied from Net::Mosso::CloudFiles
+sub BUILD {
+  my $self = shift;
+  my $ua   = LWP::UserAgent::Determined->new(
+   keep_alive            => 10,
+   requests_redirectable => [qw(GET HEAD DELETE PUT)],
+  );
+  $ua->timing('1,2,4,8,16,32');
+  $ua->conn_cache(
+    LWP::ConnCache::MaxKeepAliveRequests->new(
+      total_capacity          => 10,
+      max_keep_alive_requests => 990,
+    )
+  );
+  my $http_codes_hr = $ua->codes_to_determinate();
+  $http_codes_hr->{422} = 1; # used by cloudfiles for upload data corruption
+  $ua->timeout( $self->timeout );
+  $ua->env_proxy;
+  $self->ua($ua);
+  $self->_authenticate;
+}
+
+sub _authenticate {
+  my $self = shift;
+  my $request = HTTP::Request->new(
+    'GET',
+    'https://auth.api.rackspacecloud.com/v1.0',
+    [
+      #'Host'        => 'auth.api.rackspacecloud.com',
+      'X-Auth-User' => $self->user,
+      'X-Auth-Key'  => $self->key,
+    ]
+  );
+  my $response = $self->_request($request);
+  confess 'Unauthorized'  if $response->code == 401;
+  confess 'Unknown error' if $response->code != 204;
+
+  my $server_management_url = $response->header('X-Server-Management-Url')
+    || confess 'Missing server management url';
+  $self->server_management_url($server_management_url);
+  my $storage_url = $response->header('X-Storage-Url')
+    || confess 'Missing storage url';
+  $self->storage_url($storage_url);
+  my $cdn_management_url = $response->header('X-CDN-Management-Url')
+    || confess 'Missing CDN management url';
+  $self->storage_url($cdn_management_url);
+  my $token = $response->header('X-Auth-Token')
+    || confess 'Missing auth token';
+  $self->token($token);
+}
 
 =head1 NAME
 
