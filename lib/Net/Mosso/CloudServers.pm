@@ -115,6 +115,22 @@ sub _request {
     $response = $self->ua->request( $request, $filename );
     warn $response->as_string if $DEBUG;
   }
+
+  # From the docs:
+  # In the event you exceed the thresholds established for your account,
+  # a 413 Rate Control HTTP response will be returned with a
+  # Reply-After header to notify the client when they can attempt to
+  # try again.
+  if ( $response->code == 413 ) {
+    my $when = $response->header('Reply-After');
+    if (!defined $when) {
+      $when = 'in about 10 mins';
+    } else {
+      $when = 'at ' . $when;
+    }
+    confess "Cannot execute request as rate control limit exceeded; retry ", $when;
+  }
+
   return $response;
 }
 
