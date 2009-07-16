@@ -3,6 +3,7 @@ use warnings;
 use strict;
 use Moose;
 use MooseX::StrictConstructor;
+use Net::Mosso::CloudServers::Flavor;
 use Data::Stream::Bulk::Callback;
 use DateTime::Format::HTTP;
 use LWP::ConnCache::MaxKeepAliveRequests;
@@ -226,6 +227,40 @@ sub limits {
   #   cloudservers => $self,
   #   limits => $hash_response->{limits}
   # );
+}
+
+sub flavors {
+  my $self    = shift;
+  my $detail  = shift;
+  my $request = HTTP::Request->new(
+    'GET',
+    $self->server_management_url . ((defined $detail && $detail) ? '/flavors/detail' : '/flavors'),
+    [ 'X-Auth-Token' => $self->token ]
+  );
+  my $response = $self->_request($request);
+  return if $response->code == 204;
+  confess 'Unknown error' if $response->code != 200;
+  my $hash_response = from_json( $response->content );
+  warn Dump($hash_response) if $DEBUG;
+
+  confess 'response does not contain key "flavors"' if ( !defined $hash_response->{flavors} );
+  confess 'response does not contain arrayref of "flavors"'
+    if ( ref $hash_response->{flavors} ne 'ARRAY' );
+
+  return map {
+    Net::Mosso::CloudServers::Flavor->new(
+      cloudservers => $self,
+      id => $_->{id},
+      name => $_->{name},
+      ram => $_->{ram},
+      disk => $_->{disk},
+    )
+  } @{$hash_response->{flavors}};
+}
+
+sub flavorsdetails {
+  my $self = shift;
+  return $self->flavors(1);
 }
 
 =head1 NAME
