@@ -121,7 +121,7 @@ sub _request {
 sub servers {
   my $self = shift;
   my $request = HTTP::Request->new(
-    'GET', $self->server_management_url,
+    'GET', $self->server_management_url . '/servers',
     [ 'X-Auth-Token' => $self->token ]
   );
   my $response = $self->_request($request);
@@ -130,10 +130,17 @@ sub servers {
   my @servers;
   my $hash_response = from_json( $response->content );
   warn Dump($hash_response) if $DEBUG;
-  foreach my $name ( keys %$hash_response ) {
+  # {"servers":[{"name":"test00","id":12345}]}
+  confess 'response does not contain key "servers"' if (!defined $hash_response->{servers});
+  confess 'response does not contain arrayref of "servers"' if (ref $hash_response->{servers} ne 'ARRAY');
+  my @response_servers = @{ $hash_response->{servers} };
+  foreach my $hserver ( @{ $hash_response->{servers} } ) {
     #push @servers,
-    #  Net::Mosso::CloudServers::Container->new(
+    #  Net::Mosso::CloudServers::Server->new(
+    #    id   => $hserver->{id},
+    #    name => $hserver->{name}
     #  );
+    warn "Name: ", $hserver->{name}, " id: ", $hserver->{id} if ($DEBUG);
   }
   return @servers;
 }
