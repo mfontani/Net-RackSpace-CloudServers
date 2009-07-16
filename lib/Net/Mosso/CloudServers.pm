@@ -13,24 +13,23 @@ use YAML;
 
 our $DEBUG = 0;
 
-has 'user'    => ( is => 'ro', isa => 'Str', required => 1 );
-has 'key'     => ( is => 'ro', isa => 'Str', required => 1 );
-has 'timeout' => ( is => 'ro', isa => 'Num', required => 0, default => 30 );
+has 'user'    => ( is => 'ro', isa => 'Str',            required => 1 );
+has 'key'     => ( is => 'ro', isa => 'Str',            required => 1 );
+has 'timeout' => ( is => 'ro', isa => 'Num',            required => 0, default => 30 );
 has 'ua'      => ( is => 'rw', isa => 'LWP::UserAgent', required => 0 );
 
 has 'server_management_url' => (
-  is => 'rw',
-  isa => 'Str',
+  is       => 'rw',
+  isa      => 'Str',
   required => 0,
 );
 has 'storage_url' => (
-  is => 'rw',
-  isa => 'Str',
+  is       => 'rw',
+  isa      => 'Str',
   required => 0,
 );
-has 'cdn_management_url' => ( is => 'rw', isa => 'Str',            required => 0 );
-has 'token'       => ( is => 'rw', isa => 'Str',            required => 0 );
-
+has 'cdn_management_url' => ( is => 'rw', isa => 'Str', required => 0 );
+has 'token'              => ( is => 'rw', isa => 'Str', required => 0 );
 
 no Moose;
 __PACKAGE__->meta->make_immutable();
@@ -39,8 +38,8 @@ __PACKAGE__->meta->make_immutable();
 sub BUILD {
   my $self = shift;
   my $ua   = LWP::UserAgent::Determined->new(
-   keep_alive            => 10,
-   requests_redirectable => [qw(GET HEAD DELETE PUT)],
+    keep_alive            => 10,
+    requests_redirectable => [qw(GET HEAD DELETE PUT)],
   );
   $ua->timing('1,2,4,8,16,32');
   $ua->conn_cache(
@@ -50,7 +49,7 @@ sub BUILD {
     )
   );
   my $http_codes_hr = $ua->codes_to_determinate();
-  $http_codes_hr->{422} = 1; # used by cloudfiles for upload data corruption
+  $http_codes_hr->{422} = 1;    # used by cloudfiles for upload data corruption
   $ua->timeout( $self->timeout );
   $ua->env_proxy;
   $self->ua($ua);
@@ -58,12 +57,11 @@ sub BUILD {
 }
 
 sub _authenticate {
-  my $self = shift;
+  my $self    = shift;
   my $request = HTTP::Request->new(
     'GET',
     'https://auth.api.rackspacecloud.com/v1.0',
     [
-      #'Host'        => 'auth.api.rackspacecloud.com',
       'X-Auth-User' => $self->user,
       'X-Auth-Key'  => $self->key,
     ]
@@ -104,6 +102,7 @@ sub _request {
   # receiving a 401 Unauthorized response.
 
   if ( $response->code == 401 && $request->header('X-Auth-Token') ) {
+
     # http://trac.cyberduck.ch/ticket/2876
     # Be warned that the token will expire over time (possibly as short
     # as an hour). The application should trap a 401 (Unauthorized)
@@ -123,7 +122,7 @@ sub _request {
   # try again.
   if ( $response->code == 413 ) {
     my $when = $response->header('Reply-After');
-    if (!defined $when) {
+    if ( !defined $when ) {
       $when = 'in about 10 mins';
     } else {
       $when = 'at ' . $when;
@@ -135,9 +134,10 @@ sub _request {
 }
 
 sub servers {
-  my $self = shift;
+  my $self    = shift;
   my $request = HTTP::Request->new(
-    'GET', $self->server_management_url . '/servers',
+    'GET',
+    $self->server_management_url . '/servers',
     [ 'X-Auth-Token' => $self->token ]
   );
   my $response = $self->_request($request);
@@ -146,11 +146,14 @@ sub servers {
   my @servers;
   my $hash_response = from_json( $response->content );
   warn Dump($hash_response) if $DEBUG;
+
   # {"servers":[{"name":"test00","id":12345}]}
-  confess 'response does not contain key "servers"' if (!defined $hash_response->{servers});
-  confess 'response does not contain arrayref of "servers"' if (ref $hash_response->{servers} ne 'ARRAY');
+  confess 'response does not contain key "servers"' if ( !defined $hash_response->{servers} );
+  confess 'response does not contain arrayref of "servers"'
+    if ( ref $hash_response->{servers} ne 'ARRAY' );
   my @response_servers = @{ $hash_response->{servers} };
   foreach my $hserver ( @{ $hash_response->{servers} } ) {
+
     #push @servers,
     #  Net::Mosso::CloudServers::Server->new(
     #    id   => $hserver->{id},
@@ -162,9 +165,10 @@ sub servers {
 }
 
 sub serversdetails {
-  my $self = shift;
+  my $self    = shift;
   my $request = HTTP::Request->new(
-    'GET', $self->server_management_url . '/servers/detail',
+    'GET',
+    $self->server_management_url . '/servers/detail',
     [ 'X-Auth-Token' => $self->token ]
   );
   my $response = $self->_request($request);
@@ -173,11 +177,14 @@ sub serversdetails {
   my @servers;
   my $hash_response = from_json( $response->content );
   warn Dump($hash_response) if $DEBUG;
+
   # {"servers":[{"name":"test00","id":12345}]}
-  confess 'response does not contain key "servers"' if (!defined $hash_response->{servers});
-  confess 'response does not contain arrayref of "servers"' if (ref $hash_response->{servers} ne 'ARRAY');
+  confess 'response does not contain key "servers"' if ( !defined $hash_response->{servers} );
+  confess 'response does not contain arrayref of "servers"'
+    if ( ref $hash_response->{servers} ne 'ARRAY' );
   my @response_servers = @{ $hash_response->{servers} };
   foreach my $hserver ( @{ $hash_response->{servers} } ) {
+
     #push @servers,
     #  Net::Mosso::CloudServers::Server->new(
     #    id        => $hserver->{id},
@@ -191,15 +198,17 @@ sub serversdetails {
     #    metadata  => $hserver->{metadata},
     #  );
     warn "Name: ", $hserver->{name}, " id: ", $hserver->{id}, ' public IP: ',
-      "@{ $hserver->{addresses}->{public} } " if ($DEBUG);
+      "@{ $hserver->{addresses}->{public} } "
+      if ($DEBUG);
   }
   return @servers;
 }
 
 sub limits {
-  my $self = shift;
+  my $self    = shift;
   my $request = HTTP::Request->new(
-    'GET', $self->server_management_url . '/limits',
+    'GET',
+    $self->server_management_url . '/limits',
     [ 'X-Auth-Token' => $self->token ]
   );
   my $response = $self->_request($request);
@@ -207,9 +216,12 @@ sub limits {
   confess 'Unknown error' if $response->code != 200;
   my $hash_response = from_json( $response->content );
   warn Dump($hash_response) if $DEBUG;
-  #{"limits":{"absolute":{"maxTotalRAMSize":51200,"maxIPGroupMembers":25,"maxNumServers":25,"maxIPGroups":25},"rate":[{"value":50,"unit":"DAY","verb":"POST","remaining":50,"URI":"\/servers*","resetTime":1247769469,"regex":"^\/servers"},{"value":10,"unit":"MINUTE","verb":"POST","remaining":10,"URI":"*","resetTime":1247769469,"regex":".*"},{"value":600,"unit":"MINUTE","verb":"DELETE","remaining":600,"URI":"*","resetTime":1247769469,"regex":".*"},{"value":10,"unit":"MINUTE","verb":"PUT","remaining":10,"URI":"*","resetTime":1247769469,"regex":".*"},{"value":3,"unit":"MINUTE","verb":"GET","remaining":3,"URI":"*changes-since*","resetTime":1247769469,"regex":"changes-since"}]}}
-  confess 'response does not contain key "limits"' if (!defined $hash_response->{limits});
-  confess 'response does not contain hashref of "limits"' if (ref $hash_response->{limits} ne 'HASH');
+
+#{"limits":{"absolute":{"maxTotalRAMSize":51200,"maxIPGroupMembers":25,"maxNumServers":25,"maxIPGroups":25},"rate":[{"value":50,"unit":"DAY","verb":"POST","remaining":50,"URI":"\/servers*","resetTime":1247769469,"regex":"^\/servers"},{"value":10,"unit":"MINUTE","verb":"POST","remaining":10,"URI":"*","resetTime":1247769469,"regex":".*"},{"value":600,"unit":"MINUTE","verb":"DELETE","remaining":600,"URI":"*","resetTime":1247769469,"regex":".*"},{"value":10,"unit":"MINUTE","verb":"PUT","remaining":10,"URI":"*","resetTime":1247769469,"regex":".*"},{"value":3,"unit":"MINUTE","verb":"GET","remaining":3,"URI":"*changes-since*","resetTime":1247769469,"regex":"changes-since"}]}}
+  confess 'response does not contain key "limits"' if ( !defined $hash_response->{limits} );
+  confess 'response does not contain hashref of "limits"'
+    if ( ref $hash_response->{limits} ne 'HASH' );
+
   # return Net::Mosso::CloudServers::Limits->new(
   #   cloudservers => $self,
   #   limits => $hash_response->{limits}
@@ -311,4 +323,4 @@ under the same terms as Perl itself.
 
 =cut
 
-1; # End of Net::Mosso::CloudServers
+1;    # End of Net::Mosso::CloudServers
