@@ -161,6 +161,22 @@ Net::Mosso::CloudServers - Interface to Mosso/RackSpace CloudServers via API
     print 'Have server ', $server->name, ' id ', $server->id, "\n";
   }
 
+=head1 METHODS
+
+=head2 new / BUILD
+
+The constructor logs you into CloudServers:
+
+  my $cs = Net::Mosso::CloudServers->new(
+    user => 'myusername', key => 'mysecretkey'
+  );
+
+=head2 servers
+
+Lists all the servers and returns them as a L<Net::Mosso::CloudServers::Server> object:
+
+  my @servers = $cs->servers;
+
 =head1 AUTHOR
 
 Marco Fontani, C<< <mfontani at cpan.org> >>
