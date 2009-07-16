@@ -248,6 +248,12 @@ Lists all the servers and returns them as a L<Net::Mosso::CloudServers::Server> 
 
   my @servers = $cs->servers;
 
+=head2 serversdetails
+
+Lists more details about all the servers and returns them as a L<Net::Mosso::CloudServers::Server> object:
+
+  my @servers = $cs->serversdetails;
+
 =head2 limits
 
 Lists all the limits currently set for the account, and returns them as a L<Net::Mosso::CloudServers::Limits> object:
