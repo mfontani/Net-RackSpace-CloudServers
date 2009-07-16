@@ -161,6 +161,26 @@ sub servers {
   return @servers;
 }
 
+sub limits {
+  my $self = shift;
+  my $request = HTTP::Request->new(
+    'GET', $self->server_management_url . '/limits',
+    [ 'X-Auth-Token' => $self->token ]
+  );
+  my $response = $self->_request($request);
+  return if $response->code == 204;
+  confess 'Unknown error' if $response->code != 200;
+  my $hash_response = from_json( $response->content );
+  warn Dump($hash_response) if $DEBUG;
+  #{"limits":{"absolute":{"maxTotalRAMSize":51200,"maxIPGroupMembers":25,"maxNumServers":25,"maxIPGroups":25},"rate":[{"value":50,"unit":"DAY","verb":"POST","remaining":50,"URI":"\/servers*","resetTime":1247769469,"regex":"^\/servers"},{"value":10,"unit":"MINUTE","verb":"POST","remaining":10,"URI":"*","resetTime":1247769469,"regex":".*"},{"value":600,"unit":"MINUTE","verb":"DELETE","remaining":600,"URI":"*","resetTime":1247769469,"regex":".*"},{"value":10,"unit":"MINUTE","verb":"PUT","remaining":10,"URI":"*","resetTime":1247769469,"regex":".*"},{"value":3,"unit":"MINUTE","verb":"GET","remaining":3,"URI":"*changes-since*","resetTime":1247769469,"regex":"changes-since"}]}}
+  confess 'response does not contain key "limits"' if (!defined $hash_response->{limits});
+  confess 'response does not contain hashref of "limits"' if (ref $hash_response->{limits} ne 'HASH');
+  # return Net::Mosso::CloudServers::Limits->new(
+  #   cloudservers => $self,
+  #   limits => $hash_response->{limits}
+  # );
+}
+
 =head1 NAME
 
 Net::Mosso::CloudServers - Interface to Mosso/RackSpace CloudServers via API
@@ -192,6 +212,12 @@ The constructor logs you into CloudServers:
 Lists all the servers and returns them as a L<Net::Mosso::CloudServers::Server> object:
 
   my @servers = $cs->servers;
+
+=head2 limits
+
+Lists all the limits currently set for the account, and returns them as a L<Net::Mosso::CloudServers::Limits> object:
+
+  my $limits = $cs->limits;
 
 =head1 AUTHOR
 
