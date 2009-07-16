@@ -8,6 +8,8 @@ use DateTime::Format::HTTP;
 use LWP::ConnCache::MaxKeepAliveRequests;
 use LWP::UserAgent::Determined;
 use URI::QueryParam;
+use JSON;
+use YAML;
 
 our $DEBUG = 0;
 
@@ -95,6 +97,12 @@ sub _request {
   warn $request->as_string if $DEBUG;
   my $response = $self->ua->request( $request, $filename );
   warn $response->as_string if $DEBUG;
+
+  # From the docs:
+  # Authentication tokens are typically valid for 24 hours.
+  # Applications should be designed to re-authenticate after
+  # receiving a 401 Unauthorized response.
+
   if ( $response->code == 401 && $request->header('X-Auth-Token') ) {
     # http://trac.cyberduck.ch/ticket/2876
     # Be warned that the token will expire over time (possibly as short
@@ -110,7 +118,25 @@ sub _request {
   return $response;
 }
 
-
+sub servers {
+  my $self = shift;
+  my $request = HTTP::Request->new(
+    'GET', $self->server_management_url,
+    [ 'X-Auth-Token' => $self->token ]
+  );
+  my $response = $self->_request($request);
+  return if $response->code == 204;
+  confess 'Unknown error' if $response->code != 200;
+  my @servers;
+  my $hash_response = from_json( $response->content );
+  warn Dump($hash_response) if $DEBUG;
+  foreach my $name ( keys %$hash_response ) {
+    #push @servers,
+    #  Net::Mosso::CloudServers::Container->new(
+    #  );
+  }
+  return @servers;
+}
 
 =head1 NAME
 
