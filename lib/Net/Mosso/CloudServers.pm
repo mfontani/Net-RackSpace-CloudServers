@@ -147,39 +147,19 @@ sub servers {
 
 =head1 NAME
 
-Net::Mosso::CloudServers - The great new Net::Mosso::CloudServers!
+Net::Mosso::CloudServers - Interface to Mosso/RackSpace CloudServers via API
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
-    use Net::Mosso::CloudServers;
-
-    my $foo = Net::Mosso::CloudServers->new();
-    ...
-
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
-=head1 FUNCTIONS
-
-=head2 function1
-
-=cut
-
-sub function1 {
-}
-
-=head2 function2
-
-=cut
-
-sub function2 {
-}
+  use Net::Mosso::CloudServers;
+  my $cs = Net::Mosso::CloudServers->new(
+    user => 'myusername', key => 'mysecretkey'
+  );
+  # list my servers;
+  my @servers = $cs->servers;
+  foreach my $server ( @servers ) {
+    print 'Have server ', $server->name, ' id ', $server->id, "\n";
+  }
 
 =head1 AUTHOR
 
@@ -196,7 +176,6 @@ automatically be notified of progress on your bug as I make changes.
 You can find documentation for this module with the perldoc command.
 
     perldoc Net::Mosso::CloudServers
-
 
 You can also look for information at:
 
@@ -220,9 +199,9 @@ L<http://search.cpan.org/dist/Net-Mosso-CloudServers/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
+Leon Brocard for L<Net::Mosso::CloudFiles>
 
 =head1 COPYRIGHT & LICENSE
 
@@ -230,7 +209,6 @@ Copyright 2009 Marco Fontani, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
 
 =cut
 
