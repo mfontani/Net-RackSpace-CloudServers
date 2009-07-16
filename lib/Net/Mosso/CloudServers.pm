@@ -1,11 +1,22 @@
 package Net::Mosso::CloudServers;
 use warnings;
 use strict;
+use Moose;
+use MooseX::StrictConstructor;
+use Data::Stream::Bulk::Callback;
+use DateTime::Format::HTTP;
+use LWP::ConnCache::MaxKeepAliveRequests;
+use LWP::UserAgent::Determined;
+use URI::QueryParam;
+
+our $DEBUG = 0;
+
+no Moose;
+__PACKAGE__->meta->make_immutable();
 
 =head1 NAME
 
 Net::Mosso::CloudServers - The great new Net::Mosso::CloudServers!
-
 
 =head1 SYNOPSIS
 
@@ -48,9 +59,6 @@ Marco Fontani, C<< <mfontani at cpan.org> >>
 Please report any bugs or feature requests to C<bug-net-mosso-cloudservers at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Mosso-CloudServers>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 
