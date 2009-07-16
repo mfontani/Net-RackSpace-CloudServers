@@ -73,16 +73,44 @@ sub _authenticate {
   my $server_management_url = $response->header('X-Server-Management-Url')
     || confess 'Missing server management url';
   $self->server_management_url($server_management_url);
+  my $token = $response->header('X-Auth-Token')
+    || confess 'Missing auth token';
+  $self->token($token);
+
+  # From the docs:
+  # The URLs specified in X-Storage-Url and X-CDN-Management-Url
+  # are specific to the Cloud Files product and may be ignored
+  # for purposes of interacting with Cloud Servers.
+
   my $storage_url = $response->header('X-Storage-Url')
     || confess 'Missing storage url';
   $self->storage_url($storage_url);
   my $cdn_management_url = $response->header('X-CDN-Management-Url')
     || confess 'Missing CDN management url';
   $self->storage_url($cdn_management_url);
-  my $token = $response->header('X-Auth-Token')
-    || confess 'Missing auth token';
-  $self->token($token);
 }
+
+sub _request {
+  my ( $self, $request, $filename ) = @_;
+  warn $request->as_string if $DEBUG;
+  my $response = $self->ua->request( $request, $filename );
+  warn $response->as_string if $DEBUG;
+  if ( $response->code == 401 && $request->header('X-Auth-Token') ) {
+    # http://trac.cyberduck.ch/ticket/2876
+    # Be warned that the token will expire over time (possibly as short
+    # as an hour). The application should trap a 401 (Unauthorized)
+    # response on a given request (to either storage or cdn system)
+    # and then re-authenticate to obtain an updated token.
+    $self->_authenticate;
+    $request->header( 'X-Auth-Token', $self->token );
+    warn $request->as_string if $DEBUG;
+    $response = $self->ua->request( $request, $filename );
+    warn $response->as_string if $DEBUG;
+  }
+  return $response;
+}
+
+
 
 =head1 NAME
 
