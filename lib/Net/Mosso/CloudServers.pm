@@ -1,19 +1,10 @@
 package Net::Mosso::CloudServers;
-
 use warnings;
 use strict;
 
 =head1 NAME
 
 Net::Mosso::CloudServers - The great new Net::Mosso::CloudServers!
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
 
 
 =head1 SYNOPSIS
