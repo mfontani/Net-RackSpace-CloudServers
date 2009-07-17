@@ -13,5 +13,6 @@ my $CS = Net::Mosso::CloudServers->new(
   key  => $key,
 );
 
-$CS->flavors;
-$CS->flavorsdetails;
+$CS->get_flavor;
+$CS->get_flavor_detail(1);
+$CS->get_flavor_detail;

@@ -229,13 +229,18 @@ sub limits {
   # );
 }
 
-sub flavors {
-  my $self    = shift;
-  my $detail  = shift;
+sub get_flavor {
+  my $self   = shift;
+  my $id     = shift;
+  my $detail = shift;
+  my $uri    = (
+      ( defined $detail && $detail )
+    ? ( defined $id ? '/flavors/' . $id : '/flavors/detail' )
+    : ( defined $id ? '/flavors/' . $id : '/flavors' )
+  );
   my $request = HTTP::Request->new(
     'GET',
-    $self->server_management_url
-      . ( ( defined $detail && $detail ) ? '/flavors/detail' : '/flavors' ),
+    $self->server_management_url . $uri,
     [ 'X-Auth-Token' => $self->token ]
   );
   my $response = $self->_request($request);
@@ -244,9 +249,14 @@ sub flavors {
   my $hash_response = from_json( $response->content );
   warn Dump($hash_response) if $DEBUG;
 
-  confess 'response does not contain key "flavors"' if ( !defined $hash_response->{flavors} );
+  confess 'response does not contain key "flavors"'
+    if ( !defined $id && !defined $hash_response->{flavors} );
+  confess 'response does not contain key "flavor"'
+    if ( defined $id && !defined $hash_response->{flavor} );
   confess 'response does not contain arrayref of "flavors"'
-    if ( ref $hash_response->{flavors} ne 'ARRAY' );
+    if ( !defined $id && ref $hash_response->{flavors} ne 'ARRAY' );
+  confess 'response does not contain hashref of "flavor"'
+    if ( defined $id && ref $hash_response->{flavor} ne 'HASH' );
 
   return map {
     Net::Mosso::CloudServers::Flavor->new(
@@ -256,12 +266,20 @@ sub flavors {
       ram          => $_->{ram},
       disk         => $_->{disk},
       )
-  } @{ $hash_response->{flavors} };
+  } @{ $hash_response->{flavors} } if ( !defined $id );
+  return Net::Mosso::CloudServers::Flavor->new(
+    cloudservers => $self,
+    id           => $hash_response->{flavor}->{id},
+    name         => $hash_response->{flavor}->{name},
+    ram          => $hash_response->{flavor}->{ram},
+    disk         => $hash_response->{flavor}->{disk},
+  );
 }
 
-sub flavorsdetails {
+sub get_flavor_detail {
   my $self = shift;
-  return $self->flavors(1);
+  my $id   = shift;
+  return $self->get_flavor( $id, 1 );
 }
 
 =head1 NAME
@@ -307,6 +325,26 @@ Lists more details about all the servers and returns them as a L<Net::Mosso::Clo
 Lists all the limits currently set for the account, and returns them as a L<Net::Mosso::CloudServers::Limits> object:
 
   my $limits = $cs->limits;
+
+=head2 get_flavor
+
+Lists all the flavors able to be used. If no ID is passed as parameter, returns an array of
+L<Net::Mosso::CloudServers::Flavor> object containing only B<id> and B<name> set.
+If an ID is passed as parameter, it will return a L<Net::Mosso::CloudServers::Flavor> object
+containing B<id>, B<name>, B<ram> and B<disk>.
+
+  my @flavors = $cs->get_flavor;
+  foreach (@flavors) { print $_->id, ' ', $_->name, "\n" }
+
+  my $f1 = $cs->get_flavor(1);
+  print join(' ', $f1->id, $f1->name, $f1->ram, $f1->disk), "\n";
+
+=head2 get_flavor_detail
+
+Lists details of all the flavors able to be used. If no ID is passed as parameter, returns an
+array of L<Net::Mosso::CloudServers::Flavor>. All details are returned back: B<id>, B<name>,
+B<ram> and B<disk>. If an ID is passed as parameter, it will return a L<Net::Mosso::CloudServers::Flavor>
+object with all details filled in.
 
 =head1 AUTHOR
 
