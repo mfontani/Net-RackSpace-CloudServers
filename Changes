@@ -1,4 +1,7 @@
-Revision history for Net-Mosso-CloudServers
+Revision history for Net-RackSpace-CloudServers
+
+0.03    2009-07-17 1530 BST
+        Refactored servers; will be changed to Net-RackSpace-CloudServers
 
 0.02    2009-07-16 1942 BST
         Able to list servers and limits

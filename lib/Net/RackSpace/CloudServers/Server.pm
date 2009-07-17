@@ -1,10 +1,10 @@
-package Net::Mosso::CloudServers::Server;
+package Net::RackSpace::CloudServers::Server;
 use warnings;
 use strict;
 use Moose;
 use MooseX::StrictConstructor;
 
-has 'cloudservers'    => ( is => 'rw', isa => 'Net::Mosso::CloudServers', required => 1 );
+has 'cloudservers'    => ( is => 'rw', isa => 'Net::RackSpace::CloudServers', required => 1 );
 has 'id'              => ( is => 'ro', isa => 'Int',                      required => 1 );
 has 'name'            => ( is => 'ro', isa => 'Str',                      required => 1 );
 has 'imageid'         => ( is => 'ro', isa => 'Maybe[Int]',               required => 1 );
@@ -21,14 +21,14 @@ __PACKAGE__->meta->make_immutable();
 
 =head1 NAME
 
-Net::Mosso::CloudServers::Server - a Mosso/RackSpace CloudServers Server instance
+Net::RackSpace::CloudServers::Server - a RackSpace CloudServers Server instance
 
 =head1 SYNOPSIS
 
-  use Net::Mosso::CloudServers;
-  use Net::Mosso::CloudServers::Server;
-  my $cs = Net::Mosso::CloudServers->new( user => 'myusername', key => 'mysecretkey' );
-  my $server = Net::Mosso::CloudServers::Server->new(
+  use Net::RackSpace::CloudServers;
+  use Net::RackSpace::CloudServers::Server;
+  my $cs = Net::RackSpace::CloudServers->new( user => 'myusername', key => 'mysecretkey' );
+  my $server = Net::RackSpace::CloudServers::Server->new(
     cloudservers => $cs,
     id => '1', name => 'test',
   );
@@ -51,13 +51,13 @@ Net::Mosso::CloudServers::Server - a Mosso/RackSpace CloudServers Server instanc
 
 The constructor creates a Server:
 
-  my $server = Net::Mosso::CloudServers::Server->new(
+  my $server = Net::RackSpace::CloudServers::Server->new(
     cloudserver => $cs
     id => 'id', name => 'name',
   );
   
-This normally gets created for you by L<Net::Mosso::Cloudserver>'s L<get_server> or L<get_server_detail> methods.
-Needs a Net::Mosso::CloudServers object as B<cloudserver> parameter.
+This normally gets created for you by L<Net::RackSpace::Cloudserver>'s L<get_server> or L<get_server_detail> methods.
+Needs a Net::RackSpace::CloudServers object as B<cloudserver> parameter.
 
 =head2 id
 
@@ -69,11 +69,11 @@ The name which identifies the server
 
 =head2 imageid
 
-The ID of the L<Net::Mosso::CloudServer::Image> from which the server has been created
+The ID of the L<Net::RackSpace::CloudServer::Image> from which the server has been created
 
 =head2 flavorid
 
-The ID of the L<Net::Mosso::CloudServer::Flavor> the server is currently running as
+The ID of the L<Net::RackSpace::CloudServer::Flavor> the server is currently running as
 
 =head2 hostid
 
@@ -105,15 +105,15 @@ Marco Fontani, C<< <mfontani at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-net-mosso-cloudservers at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Mosso-CloudServers>.  I will be notified, and then you'll
+Please report any bugs or feature requests to C<bug-net-rackspace-cloudservers at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-RackSpace-CloudServers>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Net::Mosso::CloudServers::Server
+    perldoc Net::RackSpace::CloudServers::Server
 
 You can also look for information at:
 
@@ -121,25 +121,21 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Mosso-CloudServers>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-RackSpace-CloudServers>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Net-Mosso-CloudServers>
+L<http://annocpan.org/dist/Net-RackSpace-CloudServers>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Net-Mosso-CloudServers>
+L<http://cpanratings.perl.org/d/Net-RackSpace-CloudServers>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Net-Mosso-CloudServers/>
+L<http://search.cpan.org/dist/Net-RackSpace-CloudServers/>
 
 =back
-
-=head1 ACKNOWLEDGEMENTS
-
-Leon Brocard for L<Net::Mosso::CloudFiles>
 
 =head1 COPYRIGHT & LICENSE
 
@@ -150,4 +146,4 @@ under the same terms as Perl itself.
 
 =cut
 
-1;    # End of Net::Mosso::CloudServers::Server
+1;    # End of Net::RackSpace::CloudServers::Server

@@ -1,12 +1,12 @@
-package Net::Mosso::CloudServers;
+package Net::RackSpace::CloudServers;
 use warnings;
 use strict;
 use Moose;
 use MooseX::StrictConstructor;
-use Net::Mosso::CloudServers::Flavor;
-use Net::Mosso::CloudServers::Server;
-use Data::Stream::Bulk::Callback;
-use DateTime::Format::HTTP;
+use Net::RackSpace::CloudServers::Flavor;
+use Net::RackSpace::CloudServers::Server;
+#use Data::Stream::Bulk::Callback;
+#use DateTime::Format::HTTP;
 use LWP::ConnCache::MaxKeepAliveRequests;
 use LWP::UserAgent::Determined;
 use URI::QueryParam;
@@ -168,7 +168,7 @@ sub get_server {
     if ( defined $id && ref $hash_response->{server} ne 'HASH' );
 
   return map {
-    Net::Mosso::CloudServers::Server->new(
+    Net::RackSpace::CloudServers::Server->new(
       cloudservers    => $self,
       id              => $_->{id},
       name            => $_->{name},
@@ -185,7 +185,7 @@ sub get_server {
   } @{ $hash_response->{servers} } if ( !defined $id );
 
   my $hserver = $hash_response->{server};
-  return Net::Mosso::CloudServers::Server->new(
+  return Net::RackSpace::CloudServers::Server->new(
     cloudservers    => $self,
     id              => $hserver->{id},
     name            => $hserver->{name},
@@ -224,7 +224,7 @@ sub limits {
   confess 'response does not contain hashref of "limits"'
     if ( ref $hash_response->{limits} ne 'HASH' );
 
-  # return Net::Mosso::CloudServers::Limits->new(
+  # return Net::RackSpace::CloudServers::Limits->new(
   #   cloudservers => $self,
   #   limits => $hash_response->{limits}
   # );
@@ -260,7 +260,7 @@ sub get_flavor {
     if ( defined $id && ref $hash_response->{flavor} ne 'HASH' );
 
   return map {
-    Net::Mosso::CloudServers::Flavor->new(
+    Net::RackSpace::CloudServers::Flavor->new(
       cloudservers => $self,
       id           => $_->{id},
       name         => $_->{name},
@@ -268,7 +268,7 @@ sub get_flavor {
       disk         => $_->{disk},
       )
   } @{ $hash_response->{flavors} } if ( !defined $id );
-  return Net::Mosso::CloudServers::Flavor->new(
+  return Net::RackSpace::CloudServers::Flavor->new(
     cloudservers => $self,
     id           => $hash_response->{flavor}->{id},
     name         => $hash_response->{flavor}->{name},
@@ -285,12 +285,12 @@ sub get_flavor_detail {
 
 =head1 NAME
 
-Net::Mosso::CloudServers - Interface to Mosso/RackSpace CloudServers via API
+Net::RackSpace::CloudServers - Interface to RackSpace CloudServers via API
 
 =head1 SYNOPSIS
 
-  use Net::Mosso::CloudServers;
-  my $cs = Net::Mosso::CloudServers->new(
+  use Net::RackSpace::CloudServers;
+  my $cs = Net::RackSpace::CloudServers->new(
     user => 'myusername', key => 'mysecretkey'
   );
   # list my servers;
@@ -305,38 +305,38 @@ Net::Mosso::CloudServers - Interface to Mosso/RackSpace CloudServers via API
 
 The constructor logs you into CloudServers:
 
-  my $cs = Net::Mosso::CloudServers->new(
+  my $cs = Net::RackSpace::CloudServers->new(
     user => 'myusername', key => 'mysecretkey'
   );
 
 =head2 get_server
 
 Lists all the servers linked to the account. If no ID is passed as parameter, returns an array of
-L<Net::Mosso::CloudServers::Server> object containing only B<id> and B<name> set.
-If an ID is passed as parameter, it will return a L<Net::Mosso::CloudServers::Server> object
-containing B<id>, B<name>, B<imageid>, etc. See L<Net::Mosso::CloudServers::Server> for details.
+L<Net::RackSpace::CloudServers::Server> object containing only B<id> and B<name> set.
+If an ID is passed as parameter, it will return a L<Net::RackSpace::CloudServers::Server> object
+containing B<id>, B<name>, B<imageid>, etc. See L<Net::RackSpace::CloudServers::Server> for details.
 
   my @servers     = $cs->get_server;    # all servers, id/name
   my $test_server = $cs->get_server(1); # ID 1, detailed
 
 =head2 get_server_detail
 
-Lists more details about all the servers and returns them as a L<Net::Mosso::CloudServers::Server> object:
+Lists more details about all the servers and returns them as a L<Net::RackSpace::CloudServers::Server> object:
 
   my @servers     = $cs->get_server_detail;    # all servers, id/name
   my $test_server = $cs->get_server_detail(1); # ID 1, detailed
 
 =head2 limits
 
-Lists all the limits currently set for the account, and returns them as a L<Net::Mosso::CloudServers::Limits> object:
+Lists all the limits currently set for the account, and returns them as a L<Net::RackSpace::CloudServers::Limits> object:
 
   my $limits = $cs->limits;
 
 =head2 get_flavor
 
 Lists all the flavors able to be used. If no ID is passed as parameter, returns an array of
-L<Net::Mosso::CloudServers::Flavor> object containing only B<id> and B<name> set.
-If an ID is passed as parameter, it will return a L<Net::Mosso::CloudServers::Flavor> object
+L<Net::RackSpace::CloudServers::Flavor> object containing only B<id> and B<name> set.
+If an ID is passed as parameter, it will return a L<Net::RackSpace::CloudServers::Flavor> object
 containing B<id>, B<name>, B<ram> and B<disk>.
 
   my @flavors = $cs->get_flavor;
@@ -348,8 +348,8 @@ containing B<id>, B<name>, B<ram> and B<disk>.
 =head2 get_flavor_detail
 
 Lists details of all the flavors able to be used. If no ID is passed as parameter, returns an
-array of L<Net::Mosso::CloudServers::Flavor>. All details are returned back: B<id>, B<name>,
-B<ram> and B<disk>. If an ID is passed as parameter, it will return a L<Net::Mosso::CloudServers::Flavor>
+array of L<Net::RackSpace::CloudServers::Flavor>. All details are returned back: B<id>, B<name>,
+B<ram> and B<disk>. If an ID is passed as parameter, it will return a L<Net::RackSpace::CloudServers::Flavor>
 object with all details filled in.
 
 =head1 AUTHOR
@@ -358,15 +358,15 @@ Marco Fontani, C<< <mfontani at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-net-mosso-cloudservers at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Mosso-CloudServers>.  I will be notified, and then you'll
+Please report any bugs or feature requests to C<bug-net-rackspace-cloudservers at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-RackSpace-CloudServers>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Net::Mosso::CloudServers
+    perldoc Net::RackSpace::CloudServers
 
 You can also look for information at:
 
@@ -374,25 +374,25 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Mosso-CloudServers>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-RackSpace-CloudServers>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Net-Mosso-CloudServers>
+L<http://annocpan.org/dist/Net-RackSpace-CloudServers>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Net-Mosso-CloudServers>
+L<http://cpanratings.perl.org/d/Net-RackSpace-CloudServers>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Net-Mosso-CloudServers/>
+L<http://search.cpan.org/dist/Net-RackSpace-CloudServers/>
 
 =back
 
 =head1 ACKNOWLEDGEMENTS
 
-Leon Brocard for L<Net::Mosso::CloudFiles>
+Léon Brocard for L<Net::Mosso::CloudFiles>
 
 =head1 COPYRIGHT & LICENSE
 
@@ -403,4 +403,4 @@ under the same terms as Perl itself.
 
 =cut
 
-1;    # End of Net::Mosso::CloudServers
+1;    # End of Net::RackSpace::CloudServers

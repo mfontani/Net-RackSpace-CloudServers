@@ -48,7 +48,7 @@ TODO: {
     "placeholder date/time"       => qr(Date/time)
   );
 
-  module_boilerplate_ok('lib/Net/Mosso/CloudServers.pm');
+  module_boilerplate_ok('lib/Net/RackSpace/CloudServers.pm');
 
 
 }
