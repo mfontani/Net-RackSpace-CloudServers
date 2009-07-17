@@ -12,7 +12,7 @@ my $CS = Net::Mosso::CloudServers->new(
   key  => $key,
 );
 
-$CS->servers;
-
-$CS->serversdetails;
+$CS->get_server();
+$CS->get_server(1);
+$CS->get_server_detail();
 

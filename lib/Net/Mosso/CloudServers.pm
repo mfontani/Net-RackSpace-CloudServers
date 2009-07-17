@@ -4,6 +4,7 @@ use strict;
 use Moose;
 use MooseX::StrictConstructor;
 use Net::Mosso::CloudServers::Flavor;
+use Net::Mosso::CloudServers::Server;
 use Data::Stream::Bulk::Callback;
 use DateTime::Format::HTTP;
 use LWP::ConnCache::MaxKeepAliveRequests;
@@ -134,11 +135,18 @@ sub _request {
   return $response;
 }
 
-sub servers {
-  my $self    = shift;
+sub get_server {
+  my $self   = shift;
+  my $id     = shift;
+  my $detail = shift;
+  my $uri    = (
+      ( defined $detail && $detail )
+    ? ( defined $id ? '/servers/' . $id : '/servers/detail' )
+    : ( defined $id ? '/servers/' . $id : '/servers' )
+  );
   my $request = HTTP::Request->new(
     'GET',
-    $self->server_management_url . '/servers',
+    $self->server_management_url . $uri,
     [ 'X-Auth-Token' => $self->token ]
   );
   my $response = $self->_request($request);
@@ -149,60 +157,53 @@ sub servers {
   warn Dump($hash_response) if $DEBUG;
 
   # {"servers":[{"name":"test00","id":12345}]}
-  confess 'response does not contain key "servers"' if ( !defined $hash_response->{servers} );
-  confess 'response does not contain arrayref of "servers"'
-    if ( ref $hash_response->{servers} ne 'ARRAY' );
-  my @response_servers = @{ $hash_response->{servers} };
-  foreach my $hserver ( @{ $hash_response->{servers} } ) {
 
-    #push @servers,
-    #  Net::Mosso::CloudServers::Server->new(
-    #    id   => $hserver->{id},
-    #    name => $hserver->{name}
-    #  );
-    warn "Name: ", $hserver->{name}, " id: ", $hserver->{id} if ($DEBUG);
-  }
-  return @servers;
+  confess 'response does not contain key "servers"'
+    if ( !defined $id && !defined $hash_response->{servers} );
+  confess 'response does not contain key "server"'
+    if ( defined $id && !defined $hash_response->{server} );
+  confess 'response does not contain arrayref of "servers"'
+    if ( !defined $id && ref $hash_response->{servers} ne 'ARRAY' );
+  confess 'response does not contain hashref of "server"'
+    if ( defined $id && ref $hash_response->{server} ne 'HASH' );
+
+  return map {
+    Net::Mosso::CloudServers::Server->new(
+      cloudservers    => $self,
+      id              => $_->{id},
+      name            => $_->{name},
+      name            => $_->{name},
+      imageid         => $_->{imageId},
+      flavorid        => $_->{flavorId},
+      hostid          => $_->{hostId},
+      status          => $_->{status},
+      progress        => $_->{progress},
+      public_address  => $_->{addresses}->{public},
+      private_address => $_->{addresses}->{private},
+      metadata        => $_->{metadata},
+      )
+  } @{ $hash_response->{servers} } if ( !defined $id );
+
+  my $hserver = $hash_response->{server};
+  return Net::Mosso::CloudServers::Server->new(
+    cloudservers    => $self,
+    id              => $hserver->{id},
+    name            => $hserver->{name},
+    imageid         => $hserver->{imageId},
+    flavorid        => $hserver->{flavorId},
+    hostid          => $hserver->{hostId},
+    status          => $hserver->{status},
+    progress        => $hserver->{progress},
+    public_address  => $hserver->{addresses}->{public},
+    private_address => $hserver->{addresses}->{private},
+    metadata        => $hserver->{metadata},
+  );
 }
 
-sub serversdetails {
-  my $self    = shift;
-  my $request = HTTP::Request->new(
-    'GET',
-    $self->server_management_url . '/servers/detail',
-    [ 'X-Auth-Token' => $self->token ]
-  );
-  my $response = $self->_request($request);
-  return if $response->code == 204;
-  confess 'Unknown error' if $response->code != 200;
-  my @servers;
-  my $hash_response = from_json( $response->content );
-  warn Dump($hash_response) if $DEBUG;
-
-  # {"servers":[{"name":"test00","id":12345}]}
-  confess 'response does not contain key "servers"' if ( !defined $hash_response->{servers} );
-  confess 'response does not contain arrayref of "servers"'
-    if ( ref $hash_response->{servers} ne 'ARRAY' );
-  my @response_servers = @{ $hash_response->{servers} };
-  foreach my $hserver ( @{ $hash_response->{servers} } ) {
-
-    #push @servers,
-    #  Net::Mosso::CloudServers::Server->new(
-    #    id        => $hserver->{id},
-    #    name      => $hserver->{name},
-    #    imageid   => $hserver->{imageId},
-    #    flavorid  => $hserver->{flavorId},
-    #    hostid    => $hserver->{hostId},
-    #    status    => $hserver->{status},
-    #    progress  => $hserver->{progress},
-    #    addresses => $hserver->{addresses}, # public: [], private: []
-    #    metadata  => $hserver->{metadata},
-    #  );
-    warn "Name: ", $hserver->{name}, " id: ", $hserver->{id}, ' public IP: ',
-      "@{ $hserver->{addresses}->{public} } "
-      if ($DEBUG);
-  }
-  return @servers;
+sub get_server_detail {
+  my $self = shift;
+  my $id   = shift;
+  return $self->get_server( $id, 1 );
 }
 
 sub limits {
@@ -293,7 +294,7 @@ Net::Mosso::CloudServers - Interface to Mosso/RackSpace CloudServers via API
     user => 'myusername', key => 'mysecretkey'
   );
   # list my servers;
-  my @servers = $cs->servers;
+  my @servers = $cs->get_server;
   foreach my $server ( @servers ) {
     print 'Have server ', $server->name, ' id ', $server->id, "\n";
   }
@@ -308,17 +309,22 @@ The constructor logs you into CloudServers:
     user => 'myusername', key => 'mysecretkey'
   );
 
-=head2 servers
+=head2 get_server
 
-Lists all the servers and returns them as a L<Net::Mosso::CloudServers::Server> object:
+Lists all the servers linked to the account. If no ID is passed as parameter, returns an array of
+L<Net::Mosso::CloudServers::Server> object containing only B<id> and B<name> set.
+If an ID is passed as parameter, it will return a L<Net::Mosso::CloudServers::Server> object
+containing B<id>, B<name>, B<imageid>, etc. See L<Net::Mosso::CloudServers::Server> for details.
 
-  my @servers = $cs->servers;
+  my @servers     = $cs->get_server;    # all servers, id/name
+  my $test_server = $cs->get_server(1); # ID 1, detailed
 
-=head2 serversdetails
+=head2 get_server_detail
 
 Lists more details about all the servers and returns them as a L<Net::Mosso::CloudServers::Server> object:
 
-  my @servers = $cs->serversdetails;
+  my @servers     = $cs->get_server_detail;    # all servers, id/name
+  my $test_server = $cs->get_server_detail(1); # ID 1, detailed
 
 =head2 limits
 
