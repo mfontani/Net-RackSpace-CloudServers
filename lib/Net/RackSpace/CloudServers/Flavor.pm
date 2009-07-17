@@ -5,10 +5,10 @@ use Moose;
 use MooseX::StrictConstructor;
 
 has 'cloudservers' => ( is => 'rw', isa => 'Net::RackSpace::CloudServers', required => 1 );
-has 'id'           => ( is => 'ro', isa => 'Int',                      required => 1 );
-has 'name'         => ( is => 'ro', isa => 'Str',                      required => 1 );
-has 'ram'          => ( is => 'ro', isa => 'Maybe[Int]',               required => 1 );
-has 'disk'         => ( is => 'ro', isa => 'Maybe[Int]',               required => 1 );
+has 'id'           => ( is => 'ro', isa => 'Int',                          required => 1 );
+has 'name'         => ( is => 'ro', isa => 'Str',                          required => 1 );
+has 'ram'          => ( is => 'ro', isa => 'Maybe[Int]',                   required => 1 );
+has 'disk'         => ( is => 'ro', isa => 'Maybe[Int]',                   required => 1 );
 
 no Moose;
 __PACKAGE__->meta->make_immutable();
