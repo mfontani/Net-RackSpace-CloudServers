@@ -319,22 +319,22 @@ sub get_image {
       cloudservers => $self,
       id           => $_->{id},
       name         => $_->{name},
-      serverid         => $_->{serverId},
-      updated          => $_->{updated},
-      created          => $_->{created},
-      status => $_->{status},
-      progress => $_->{progress},
+      serverid     => $_->{serverId},
+      updated      => $_->{updated},
+      created      => $_->{created},
+      status       => $_->{status},
+      progress     => $_->{progress},
       )
   } @{ $hash_response->{images} } if ( !defined $id );
   return Net::RackSpace::CloudServers::Image->new(
     cloudservers => $self,
     id           => $hash_response->{image}->{id},
     name         => $hash_response->{image}->{name},
-    serverid         => $hash_response->{image}->{serverId},
-    updated         => $hash_response->{image}->{updated},
-    created         => $hash_response->{image}->{created},
-    status  => $hash_response->{image}->{status},
-    progress  => $hash_response->{image}->{progress},
+    serverid     => $hash_response->{image}->{serverId},
+    updated      => $hash_response->{image}->{updated},
+    created      => $hash_response->{image}->{created},
+    status       => $hash_response->{image}->{status},
+    progress     => $hash_response->{image}->{progress},
   );
 }
 
@@ -343,7 +343,6 @@ sub get_image_detail {
   my $id   = shift;
   return $self->get_image( $id, 1 );
 }
-
 
 =head1 NAME
 
