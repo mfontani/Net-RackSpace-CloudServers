@@ -5,6 +5,7 @@ use Moose;
 use MooseX::StrictConstructor;
 use Net::RackSpace::CloudServers::Flavor;
 use Net::RackSpace::CloudServers::Server;
+use Net::RackSpace::CloudServers::Image;
 
 #use Data::Stream::Bulk::Callback;
 #use DateTime::Format::HTTP;
@@ -283,6 +284,66 @@ sub get_flavor_detail {
   my $id   = shift;
   return $self->get_flavor( $id, 1 );
 }
+
+sub get_image {
+  my $self   = shift;
+  my $id     = shift;
+  my $detail = shift;
+  my $uri    = (
+      ( defined $detail && $detail )
+    ? ( defined $id ? '/images/' . $id : '/images/detail' )
+    : ( defined $id ? '/images/' . $id : '/images' )
+  );
+  my $request = HTTP::Request->new(
+    'GET',
+    $self->server_management_url . $uri,
+    [ 'X-Auth-Token' => $self->token ]
+  );
+  my $response = $self->_request($request);
+  return if $response->code == 204;
+  confess 'Unknown error' if $response->code != 200;
+  my $hash_response = from_json( $response->content );
+  warn Dump($hash_response) if $DEBUG;
+
+  confess 'response does not contain key "images"'
+    if ( !defined $id && !defined $hash_response->{images} );
+  confess 'response does not contain key "image"'
+    if ( defined $id && !defined $hash_response->{image} );
+  confess 'response does not contain arrayref of "images"'
+    if ( !defined $id && ref $hash_response->{images} ne 'ARRAY' );
+  confess 'response does not contain hashref of "image"'
+    if ( defined $id && ref $hash_response->{image} ne 'HASH' );
+
+  return map {
+    Net::RackSpace::CloudServers::Image->new(
+      cloudservers => $self,
+      id           => $_->{id},
+      name         => $_->{name},
+      serverid         => $_->{serverId},
+      updated          => $_->{updated},
+      created          => $_->{created},
+      status => $_->{status},
+      progress => $_->{progress},
+      )
+  } @{ $hash_response->{images} } if ( !defined $id );
+  return Net::RackSpace::CloudServers::Image->new(
+    cloudservers => $self,
+    id           => $hash_response->{image}->{id},
+    name         => $hash_response->{image}->{name},
+    serverid         => $hash_response->{image}->{serverId},
+    updated         => $hash_response->{image}->{updated},
+    created         => $hash_response->{image}->{created},
+    status  => $hash_response->{image}->{status},
+    progress  => $hash_response->{image}->{progress},
+  );
+}
+
+sub get_image_detail {
+  my $self = shift;
+  my $id   = shift;
+  return $self->get_image( $id, 1 );
+}
+
 
 =head1 NAME
 
