@@ -6,12 +6,8 @@ use MooseX::StrictConstructor;
 use Net::RackSpace::CloudServers::Flavor;
 use Net::RackSpace::CloudServers::Server;
 use Net::RackSpace::CloudServers::Image;
-
-#use Data::Stream::Bulk::Callback;
-#use DateTime::Format::HTTP;
 use LWP::ConnCache::MaxKeepAliveRequests;
 use LWP::UserAgent::Determined;
-use URI::QueryParam;
 use JSON;
 use YAML;
 
@@ -415,6 +411,26 @@ Lists details of all the flavors able to be used. If no ID is passed as paramete
 array of L<Net::RackSpace::CloudServers::Flavor>. All details are returned back: B<id>, B<name>,
 B<ram> and B<disk>. If an ID is passed as parameter, it will return a L<Net::RackSpace::CloudServers::Flavor>
 object with all details filled in.
+
+=head2 get_image
+
+Lists all the server/backup images able to be used. If no ID is passed as parameter, returns an
+array of L<Net::RackSpace::CloudServers::Image> object containing only B<id> and B<name> set.
+If an ID is passed as parameter, it will return a L<Net::RackSpace::CloudServers::Image> object
+with all the available attributes set.
+
+  my @images = $cs->get_image;
+  foreach (@images) { print $_->id, ' ', $_->name, "\n" }
+
+  my $f1 = $cs->get_image(1);
+  print join(' ', $f1->id, $f1->name, $f1->updated, $f1->status), "\n";
+
+=head2 get_image_detail
+
+Lists details of all the server/backup images able to be used. If no ID is passed as parameter,
+returns an array of L<Net::RackSpace::CloudServers::Image>. All details are returned back: B<id>, B<name>,
+B<serverid>, B<updated>, B<created>, B<status> and B<progress>. If an ID is passed as parameter,
+it will return a L<Net::RackSpace::CloudServers::Image> object with all details filled in.
 
 =head1 AUTHOR
 
