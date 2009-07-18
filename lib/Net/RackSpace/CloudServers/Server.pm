@@ -25,16 +25,12 @@ __PACKAGE__->meta->make_immutable();
 sub change_root_password {
   my $self     = shift;
   my $password = shift;
-  my $uri    = '/servers/' . $self->id;
-  my $request = HTTP::Request->new(
+  my $uri      = '/servers/' . $self->id;
+  my $request  = HTTP::Request->new(
     'PUT',
     $self->cloudservers->server_management_url . $uri,
     [ 'X-Auth-Token' => $self->cloudservers->token ],
-    to_json({
-      server => {
-        adminPass => $password,
-      }
-    })
+    to_json( { server => { adminPass => $password, } } )
   );
   my $response = $self->cloudservers->_request($request);
   confess 'Unknown error' if $response->code != 202;
@@ -42,24 +38,19 @@ sub change_root_password {
 }
 
 sub change_name {
-  my $self   = shift;
-  my $name   = shift;
-  my $uri    = '/servers/' . $self->id;
+  my $self    = shift;
+  my $name    = shift;
+  my $uri     = '/servers/' . $self->id;
   my $request = HTTP::Request->new(
     'PUT',
     $self->cloudservers->server_management_url . $uri,
     [ 'X-Auth-Token' => $self->cloudservers->token ],
-    to_json({
-      server => {
-        name => $name,
-      }
-    })
+    to_json( { server => { name => $name, } } )
   );
   my $response = $self->cloudservers->_request($request);
   confess 'Unknown error' if $response->code != 202;
   return $response;
 }
-
 
 =head1 NAME
 

@@ -16,8 +16,8 @@ my @flavors = $CS->get_flavor_detail;
 my @images  = $CS->get_image_detail;
 my @servers = $CS->get_server_detail;
 
-my $srvapi = (grep {$_->name eq 'apitest'} @servers)[0];
-die "can't find server named 'apitest'. Create one." if (!defined $srvapi);
+my $srvapi = ( grep { $_->name eq 'apitest' } @servers )[0];
+die "can't find server named 'apitest'. Create one." if ( !defined $srvapi );
 
 print "changing root password..\n";
 $srvapi->change_root_password('toor');
