@@ -1,8 +1,11 @@
 package Net::RackSpace::CloudServers::Server;
 use warnings;
 use strict;
+our $DEBUG = 0;
 use Moose;
 use MooseX::StrictConstructor;
+use HTTP::Request;
+use JSON;
 
 has 'cloudservers'    => ( is => 'rw', isa => 'Net::RackSpace::CloudServers', required => 1 );
 has 'id'              => ( is => 'ro', isa => 'Int',                          required => 1 );
@@ -18,6 +21,45 @@ has 'metadata'        => ( is => 'ro', isa => 'Maybe[HashRef]',               re
 
 no Moose;
 __PACKAGE__->meta->make_immutable();
+
+sub change_root_password {
+  my $self     = shift;
+  my $password = shift;
+  my $uri    = '/servers/' . $self->id;
+  my $request = HTTP::Request->new(
+    'PUT',
+    $self->cloudservers->server_management_url . $uri,
+    [ 'X-Auth-Token' => $self->cloudservers->token ],
+    to_json({
+      server => {
+        adminPass => $password,
+      }
+    })
+  );
+  my $response = $self->cloudservers->_request($request);
+  confess 'Unknown error' if $response->code != 202;
+  return $response;
+}
+
+sub change_name {
+  my $self   = shift;
+  my $name   = shift;
+  my $uri    = '/servers/' . $self->id;
+  my $request = HTTP::Request->new(
+    'PUT',
+    $self->cloudservers->server_management_url . $uri,
+    [ 'X-Auth-Token' => $self->cloudservers->token ],
+    to_json({
+      server => {
+        name => $name,
+      }
+    })
+  );
+  my $response = $self->cloudservers->_request($request);
+  confess 'Unknown error' if $response->code != 202;
+  return $response;
+}
+
 
 =head1 NAME
 
@@ -58,6 +100,20 @@ The constructor creates a Server:
   
 This normally gets created for you by L<Net::RackSpace::Cloudserver>'s L<get_server> or L<get_server_detail> methods.
 Needs a Net::RackSpace::CloudServers object as B<cloudserver> parameter.
+
+=head2 change_name
+
+Changes the server's name to the new value given. Dies on error, or returns the response
+
+  $srv->change_name('newname');
+
+=head2 change_root_password
+
+Changes the server's root password to the new value given. Dies on error, or returns the response
+
+  $srv->change_root_password('toor');
+
+=head1 ATTRIBUTES
 
 =head2 id
 

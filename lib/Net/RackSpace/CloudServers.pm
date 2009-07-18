@@ -54,6 +54,7 @@ sub BUILD {
   );
   my $http_codes_hr = $ua->codes_to_determinate();
   $http_codes_hr->{422} = 1;    # used by cloudfiles for upload data corruption
+  $http_codes_hr->{202} = 1;    # okay
   $ua->timeout( $self->timeout );
   $ua->env_proxy;
   $self->ua($ua);
@@ -96,9 +97,9 @@ sub _authenticate {
 
 sub _request {
   my ( $self, $request, $filename ) = @_;
-  warn $request->as_string if $DEBUG;
+  warn "Requesting ", $request->as_string if $DEBUG;
   my $response = $self->ua->request( $request, $filename );
-  warn $response->as_string if $DEBUG;
+  warn "Requested, got ", $response->as_string if $DEBUG;
 
   # From the docs:
   # Authentication tokens are typically valid for 24 hours.
@@ -112,9 +113,11 @@ sub _request {
     # as an hour). The application should trap a 401 (Unauthorized)
     # response on a given request (to either storage or cdn system)
     # and then re-authenticate to obtain an updated token.
+    warn "Need reauthentication" if $DEBUG;
     $self->_authenticate;
     $request->header( 'X-Auth-Token', $self->token );
     warn $request->as_string if $DEBUG;
+    warn "Re-requesting" if $DEBUG;
     $response = $self->ua->request( $request, $filename );
     warn $response->as_string if $DEBUG;
   }
