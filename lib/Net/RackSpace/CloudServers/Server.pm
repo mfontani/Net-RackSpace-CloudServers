@@ -29,7 +29,10 @@ sub change_root_password {
   my $request  = HTTP::Request->new(
     'PUT',
     $self->cloudservers->server_management_url . $uri,
-    [ 'X-Auth-Token' => $self->cloudservers->token ],
+    [
+      'X-Auth-Token' => $self->cloudservers->token,
+      'Content-Type' => 'application/json',
+    ],
     to_json( { server => { adminPass => $password, } } )
   );
   my $response = $self->cloudservers->_request($request);
@@ -44,8 +47,33 @@ sub change_name {
   my $request = HTTP::Request->new(
     'PUT',
     $self->cloudservers->server_management_url . $uri,
-    [ 'X-Auth-Token' => $self->cloudservers->token ],
+    [
+      'X-Auth-Token' => $self->cloudservers->token,
+      'Content-Type' => 'application/json',
+    ],
     to_json( { server => { name => $name, } } )
+  );
+  my $response = $self->cloudservers->_request($request);
+  confess 'Unknown error' if $response->code != 202;
+  return $response;
+}
+
+sub create_server {
+  my $self = shift;
+  my $request = HTTP::Request->new(
+    'POST',
+    $self->cloudservers->server_management_url . '/servers',
+    [
+      'X-Auth-Token' => $self->cloudservers->token,
+      'Content-Type' => 'application/json',
+    ],
+    to_json({
+      server => {
+        name     => $self->name,
+        imageId  => int $self->imageid,
+        flavorId => int $self->flavorid,
+      }
+    })
   );
   my $response = $self->cloudservers->_request($request);
   confess 'Unknown error' if $response->code != 202;
