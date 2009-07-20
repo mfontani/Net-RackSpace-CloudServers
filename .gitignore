@@ -10,3 +10,4 @@ Net-Mosso-CloudServers-*
 cover_db
 *.bak
 .build
+*~
