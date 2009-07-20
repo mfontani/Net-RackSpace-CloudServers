@@ -50,7 +50,6 @@ sub BUILD {
   );
   my $http_codes_hr = $ua->codes_to_determinate();
   $http_codes_hr->{422} = 1;    # used by cloudfiles for upload data corruption
-  $http_codes_hr->{202} = 1;    # okay
   $ua->timeout( $self->timeout );
   $ua->env_proxy;
   $self->ua($ua);
