@@ -22,9 +22,10 @@ if (grep {$_->name eq 'perlmfapitest'} @servers) {
 }
 
 ## Provision a new server
+$Net::RackSpace::CloudServers::DEBUG = 1;
+my $srv;
 {
-  $Net::RackSpace::CloudServers::DEBUG = 1;
-  my $srv = Net::RackSpace::CloudServers::Server->new(
+  my $tmp = Net::RackSpace::CloudServers::Server->new(
     cloudservers => $CS,
     name         => 'perlmfapitest',
     flavorid     => ( grep { $_->name eq '256 slice' } @flavors )[0]->id,
@@ -35,14 +36,22 @@ if (grep {$_->name eq 'perlmfapitest'} @servers) {
     public_address => undef,
     private_address => undef,
     metadata => undef,
+    adminpass => undef,
     id => 0 ,
   );
-  $srv->create_server();
-  # get new server details
-  @servers = $CS->get_server_detail;
-  $Net::RackSpace::CloudServers::DEBUG = 0;
+  $srv = $tmp->create_server();
 }
 
-my $srvapi = ( grep { $_->name eq 'perlmfapitest' } @servers )[0];
-die "can't find server named 'perlmfapitest'." if ( !defined $srvapi );
+$Net::RackSpace::CloudServers::DEBUG = 0;
+print "Created server ID ", $srv->id, ", root password is: ", $srv->adminpass, "\n";
+print "Available at public IP: @{$srv->public_address}\n";
 
+## unusable until ->status will be ACTIVE, from BUILD
+do {
+  print "Status: ", $srv->status, " progress: ", $srv->progress, "\n";
+  my @tmpservers = $CS->get_server_detail();
+  $srv = ( grep { $_->name eq 'perlmfapitest' } @tmpservers )[0];
+  sleep 5 if ( $srv->status ne 'ACTIVE' );
+} while ( $srv->status ne 'ACTIVE' );
+
+print "Server is now built and available!\n";

@@ -181,6 +181,7 @@ sub get_server {
       public_address  => $_->{addresses}->{public},
       private_address => $_->{addresses}->{private},
       metadata        => $_->{metadata},
+      adminpass       => $_->{adminPass},
       )
   } @{ $hash_response->{servers} } if ( !defined $id );
 
@@ -197,6 +198,7 @@ sub get_server {
     public_address  => $hserver->{addresses}->{public},
     private_address => $hserver->{addresses}->{private},
     metadata        => $hserver->{metadata},
+    adminpass       => $hserver->{adminPass}
   );
 }
 

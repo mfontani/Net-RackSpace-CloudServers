@@ -1,5 +1,8 @@
 Revision history for Net-RackSpace-CloudServers
 
+0.06_00 2009-07-20 2223 BST
+	Updated POD; Able to create server; re-releasing as test on CPAN
+
 0.05_00 2009-07-18 0923 BST
         Updated POD; removed unneeded modules; releasing as test on CPAN
 
