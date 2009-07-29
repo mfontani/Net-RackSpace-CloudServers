@@ -61,7 +61,7 @@ sub change_name {
 }
 
 sub create_server {
-  my $self = shift;
+  my $self    = shift;
   my $request = HTTP::Request->new(
     'POST',
     $self->cloudservers->server_management_url . '/servers',
@@ -69,13 +69,15 @@ sub create_server {
       'X-Auth-Token' => $self->cloudservers->token,
       'Content-Type' => 'application/json',
     ],
-    to_json({
-      server => {
-        name     => $self->name,
-        imageId  => int $self->imageid,
-        flavorId => int $self->flavorid,
+    to_json(
+      {
+        server => {
+          name     => $self->name,
+          imageId  => int $self->imageid,
+          flavorId => int $self->flavorid,
+        }
       }
-    })
+    )
   );
   my $response = $self->cloudservers->_request($request);
   confess 'Unknown error' if $response->code != 202;
