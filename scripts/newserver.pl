@@ -4,7 +4,6 @@ use warnings;
 use Net::RackSpace::CloudServers;
 use Net::RackSpace::CloudServers::Server;
 
-
 my $user = $ENV{'CLOUDSERVERS_USER'} or die "Need CLOUDSERVERS_USER environment variable set";
 my $key  = $ENV{'CLOUDSERVERS_KEY'}  or die "Need CLOUDSERVERS_KEY environment variable set";
 
@@ -17,7 +16,7 @@ my @flavors = $CS->get_flavor_detail;
 my @images  = $CS->get_image_detail;
 my @servers = $CS->get_server_detail;
 
-if (grep {$_->name eq 'perlmfapitest'} @servers) {
+if ( grep { $_->name eq 'perlmfapitest' } @servers ) {
   die "you already have a server named perlmfapitest, quitting\n";
 }
 
@@ -26,18 +25,18 @@ $Net::RackSpace::CloudServers::DEBUG = 1;
 my $srv;
 {
   my $tmp = Net::RackSpace::CloudServers::Server->new(
-    cloudservers => $CS,
-    name         => 'perlmfapitest',
-    flavorid     => ( grep { $_->name eq '256 slice' } @flavors )[0]->id,
-    imageid      => ( grep { $_->name =~ /jaunty/ } @images )[0]->id,
-    status       => undef,
-    hostid       => undef,
-    progress     => undef,
-    public_address => undef,
+    cloudservers    => $CS,
+    name            => 'perlmfapitest',
+    flavorid        => ( grep { $_->name eq '256 slice' } @flavors )[0]->id,
+    imageid         => ( grep { $_->name =~ /jaunty/ } @images )[0]->id,
+    status          => undef,
+    hostid          => undef,
+    progress        => undef,
+    public_address  => undef,
     private_address => undef,
-    metadata => undef,
-    adminpass => undef,
-    id => 0 ,
+    metadata        => undef,
+    adminpass       => undef,
+    id              => 0,
   );
   $srv = $tmp->create_server();
 }
