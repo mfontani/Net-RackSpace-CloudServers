@@ -67,7 +67,7 @@ sub _authenticate {
     ]
   );
   my $response = $self->_request($request);
-  confess 'Unauthorized'  if $response->code == 401;
+  confess 'Unauthorized' if $response->code == 401;
   confess 'Unknown error ' . $response->code if $response->code != 204;
 
   my $server_management_url = $response->header('X-Server-Management-Url')
@@ -151,9 +151,10 @@ sub get_server {
   );
   my $response = $self->_request($request);
   return if $response->code == 204;
-  confess 'Unknown error' if (
-    ! $response->code ~~ (200,203) # cached is 203 OK
-  );
+  confess 'Unknown error'
+    if (
+    !$response->code ~~ ( 200, 203 )    # cached is 203 OK
+    );
   my @servers;
   my $hash_response = from_json( $response->content );
   warn Dump($hash_response) if $DEBUG;
