@@ -152,10 +152,7 @@ sub get_server {
   );
   my $response = $self->_request($request);
   return if $response->code == 204;
-  confess 'Unknown error' . $response->code
-    if (
-    !$response->code ~~ ( 200, 203 )    # cached is 203 OK
-    );
+  confess 'Unknown error' . $response->code unless ( $response->code ~~ [ 200, 203 ] );
   my @servers;
   my $hash_response = from_json( $response->content );
   warn Dump($hash_response) if $DEBUG;
@@ -221,7 +218,7 @@ sub limits {
   );
   my $response = $self->_request($request);
   return if $response->code == 204;
-  confess 'Unknown error ' . $response->code if ( !$response->code ~~ ( 200, 203 ) );
+  confess 'Unknown error ' . $response->code unless ( $response->code ~~ [ 200, 203 ] );
   my $hash_response = from_json( $response->content );
   warn Dump($hash_response) if $DEBUG;
 
@@ -252,7 +249,7 @@ sub get_flavor {
   );
   my $response = $self->_request($request);
   return if $response->code == 204;
-  confess 'Unknown error ' . $response->code if ( !$response->code ~~ ( 200, 203 ) );
+  confess 'Unknown error ' . $response->code unless ( $response->code ~~ [ 200, 203 ] );
   my $hash_response = from_json( $response->content );
   warn Dump($hash_response) if $DEBUG;
 
@@ -305,7 +302,7 @@ sub get_image {
   );
   my $response = $self->_request($request);
   return if $response->code == 204;
-  confess 'Unknown error ' . $response->code if ( !$response->code ~~ ( 200, 203 ) );
+  confess 'Unknown error ' . $response->code unless ( $response->code ~~ [ 200, 203 ] );
   my $hash_response = from_json( $response->content );
   warn Dump($hash_response) if $DEBUG;
 
