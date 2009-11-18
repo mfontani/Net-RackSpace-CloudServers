@@ -10,6 +10,7 @@ use LWP::ConnCache::MaxKeepAliveRequests;
 use LWP::UserAgent::Determined;
 use JSON;
 use YAML;
+use 5.010_000;
 
 our $DEBUG = 0;
 
@@ -151,7 +152,7 @@ sub get_server {
   );
   my $response = $self->_request($request);
   return if $response->code == 204;
-  confess 'Unknown error'
+  confess 'Unknown error' . $response->code
     if (
     !$response->code ~~ ( 200, 203 )    # cached is 203 OK
     );
@@ -220,7 +221,7 @@ sub limits {
   );
   my $response = $self->_request($request);
   return if $response->code == 204;
-  confess 'Unknown error' if $response->code != 200;
+  confess 'Unknown error ' . $response->code if ( !$response->code ~~ ( 200, 203 ) );
   my $hash_response = from_json( $response->content );
   warn Dump($hash_response) if $DEBUG;
 
@@ -251,7 +252,7 @@ sub get_flavor {
   );
   my $response = $self->_request($request);
   return if $response->code == 204;
-  confess 'Unknown error' if $response->code != 200;
+  confess 'Unknown error ' . $response->code if ( !$response->code ~~ ( 200, 203 ) );
   my $hash_response = from_json( $response->content );
   warn Dump($hash_response) if $DEBUG;
 
@@ -304,7 +305,7 @@ sub get_image {
   );
   my $response = $self->_request($request);
   return if $response->code == 204;
-  confess 'Unknown error' if $response->code != 200;
+  confess 'Unknown error ' . $response->code if ( !$response->code ~~ ( 200, 203 ) );
   my $hash_response = from_json( $response->content );
   warn Dump($hash_response) if $DEBUG;
 
