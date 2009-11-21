@@ -14,6 +14,8 @@ sub opt_spec {
     ['images','list possible images and their IDs'],
     ['servers','list all your servers and their IDs'],
     ['limits','lists how many requests can still be done'],
+    ['user','specify cloudservers API user, instead of $ENV{CLOUDSERVERS_USER}'],
+    ['key','specify cloudservers API key, instead of $ENV{CLOUDSERVERS_KEY}'],
     ['help','get help for this command'],
   );
 }
@@ -27,6 +29,14 @@ sub validate_args {
     && !defined $opt->{servers}
     && !defined $opt->{limits}
   );
+  $self->usage_error('use --user or defined $ENV{CLOUDSERVERS_USER} to use this command') if (
+    !defined $opt->{user} && !defined $ENV{CLOUDSERVERS_USER}
+  );
+  $self->usage_error('use --key or defined $ENV{CLOUDSERVERS_KEY} to use this command') if (
+    !defined $opt->{key} && !defined $ENV{CLOUDSERVERS_KEY}
+  );
+  $opt->{user} //= $ENV{CLOUDSERVERS_USER};
+  $opt->{key} //= $ENV{CLOUDSERVERS_KEY};
   $self->usage_error("No args allowed") if @$args;
 }
 
