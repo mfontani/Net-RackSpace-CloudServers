@@ -1,8 +1,12 @@
-#!perl -T
+#!perl
 
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More;
+
+plan skip_all => 'author tests run only if $ENV{CLOUDSERVERS_AUTHOR_TESTS} set'
+  if ( !defined $ENV{'CLOUDSERVERS_AUTHOR_TESTS'} || !$ENV{'CLOUDSERVERS_AUTHOR_TESTS'} );
+plan 'no_plan';
 
 sub not_in_file_ok {
   my ( $filename, %regex ) = @_;
@@ -36,17 +40,9 @@ sub module_boilerplate_ok {
   );
 }
 
-TODO: {
-  local $TODO = "Need to replace the boilerplate text";
-
-  not_in_file_ok(
-    README                       => "The README is used..." => qr/The README is used/,
-    "'version information here'" => qr/to provide version information/,
-  );
-
-  not_in_file_ok( Changes => "placeholder date/time" => qr(Date/time) );
-
-  module_boilerplate_ok('lib/Net/RackSpace/CloudServers.pm');
-
-}
+not_in_file_ok( Changes => "placeholder date/time" => qr(Date/time) );
+module_boilerplate_ok('lib/Net/RackSpace/CloudServers.pm');
+module_boilerplate_ok('lib/Net/RackSpace/CloudServers/Flavor.pm');
+module_boilerplate_ok('lib/Net/RackSpace/CloudServers/Image.pm');
+module_boilerplate_ok('lib/Net/RackSpace/CloudServers/Server.pm');
 

@@ -1,8 +1,11 @@
-#!perl -T
+#!perl
 
 use strict;
 use warnings;
 use Test::More;
+
+plan skip_all => 'author tests run only if $ENV{CLOUDSERVERS_AUTHOR_TESTS} set'
+  if ( !defined $ENV{'CLOUDSERVERS_AUTHOR_TESTS'} || !$ENV{'CLOUDSERVERS_AUTHOR_TESTS'} );
 
 # Ensure a recent version of Test::Pod
 my $min_tp = 1.22;
