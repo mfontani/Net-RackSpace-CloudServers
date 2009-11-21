@@ -56,10 +56,10 @@ digraph G {
   cmd_update_opt_id [label="--id ID"];
   cmd_update_opt_adminpass [label="--pass \"password\""];
 
-  cmd_list_flavors [label="flavors"];
-  cmd_list_images [label="images"];
-  cmd_list_servers [label="servers"];
-  cmd_list_limits [label="limits"];
+  cmd_list_flavors [label="--flavors"];
+  cmd_list_images [label="--images"];
+  cmd_list_servers [label="--servers"];
+  cmd_list_limits [label="--limits"];
 
   cmd_info_id [label="--id ID"];
   cmd_info_private [label="--private"];
