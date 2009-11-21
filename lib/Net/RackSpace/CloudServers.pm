@@ -6,6 +6,7 @@ use MooseX::StrictConstructor;
 use Net::RackSpace::CloudServers::Flavor;
 use Net::RackSpace::CloudServers::Server;
 use Net::RackSpace::CloudServers::Image;
+use Net::RackSpace::CloudServers::Limits;
 use LWP::ConnCache::MaxKeepAliveRequests;
 use LWP::UserAgent::Determined;
 use JSON;
@@ -18,6 +19,14 @@ has 'user'    => ( is => 'ro', isa => 'Str',            required => 1 );
 has 'key'     => ( is => 'ro', isa => 'Str',            required => 1 );
 has 'timeout' => ( is => 'ro', isa => 'Num',            required => 0, default => 30 );
 has 'ua'      => ( is => 'rw', isa => 'LWP::UserAgent', required => 0 );
+
+has 'limits'  => ( is => 'rw', isa => 'Net::RackSpace::CloudServers::Limits', lazy => 1, required => 1,
+  default => sub {
+    my ($self) = @_;
+    return Net::RackSpace::CloudServers::Limits->new(
+      cloudservers => $self,
+    );
+});
 
 has 'server_management_url' => (
   is       => 'rw',
@@ -207,30 +216,6 @@ sub get_server_detail {
   my $self = shift;
   my $id   = shift;
   return $self->get_server( $id, 1 );
-}
-
-sub limits {
-  my $self    = shift;
-  my $request = HTTP::Request->new(
-    'GET',
-    $self->server_management_url . '/limits',
-    [ 'X-Auth-Token' => $self->token ]
-  );
-  my $response = $self->_request($request);
-  return if $response->code == 204;
-  confess 'Unknown error ' . $response->code unless ( $response->code ~~ [ 200, 203 ] );
-  my $hash_response = from_json( $response->content );
-  warn Dump($hash_response) if $DEBUG;
-
-#{"limits":{"absolute":{"maxTotalRAMSize":51200,"maxIPGroupMembers":25,"maxNumServers":25,"maxIPGroups":25},"rate":[{"value":50,"unit":"DAY","verb":"POST","remaining":50,"URI":"\/servers*","resetTime":1247769469,"regex":"^\/servers"},{"value":10,"unit":"MINUTE","verb":"POST","remaining":10,"URI":"*","resetTime":1247769469,"regex":".*"},{"value":600,"unit":"MINUTE","verb":"DELETE","remaining":600,"URI":"*","resetTime":1247769469,"regex":".*"},{"value":10,"unit":"MINUTE","verb":"PUT","remaining":10,"URI":"*","resetTime":1247769469,"regex":".*"},{"value":3,"unit":"MINUTE","verb":"GET","remaining":3,"URI":"*changes-since*","resetTime":1247769469,"regex":"changes-since"}]}}
-  confess 'response does not contain key "limits"' if ( !defined $hash_response->{limits} );
-  confess 'response does not contain hashref of "limits"'
-    if ( ref $hash_response->{limits} ne 'HASH' );
-
-  # return Net::RackSpace::CloudServers::Limits->new(
-  #   cloudservers => $self,
-  #   limits => $hash_response->{limits}
-  # );
 }
 
 sub get_flavor {
