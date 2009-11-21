@@ -42,15 +42,19 @@ sub validate_args {
 
 sub run {
   my ($self, $opt, $args) = @_;
-  _list_flavors() if ( $opt->{flavors} );
-  _list_images() if ( $opt->{images} );
-  _list_servers() if ( $opt->{servers} );
-  _list_limits() if ( $opt->{limits} );
+  my $CS = Net::RackSpace::CloudServers->new(
+    user => $opt->{user},
+    key  => $opt->{key},
+  );
+  _list_flavors($CS) if ( $opt->{flavors} );
+  _list_images($CS) if ( $opt->{images} );
+  _list_servers($CS) if ( $opt->{servers} );
+  _list_limits($CS) if ( $opt->{limits} );
 }
 
-sub _list_flavors() { say "Listing flavors"; }
-sub _list_images() { say "Listing images"; }
-sub _list_servers() { say "Listing servers"; }
-sub _list_limits() { say "Listing limits"; }
+sub _list_flavors { say "Listing flavors"; }
+sub _list_images { say "Listing images"; }
+sub _list_servers { say "Listing servers"; }
+sub _list_limits { say "Listing limits"; }
 
 1;
