@@ -221,3 +221,76 @@ Delete Backup schedule
  POST /servers/id/backup_schedule
 
 Shared IP groups
+
+Rate Limits
+ Verb       URI             RegEx         Default
+ POST       *               .*            10/min
+ POST       */servers       ^/servers     50/day
+ PUT        *               .*            10/min
+ GET        *changes-since* changes-since 3/min
+ DELETE     *               .*            100/min
+
+Absolute Limits
+                      Limit                   Default
+Maximum total amount of RAM (GB)                50
+Maximum number of shared IP groups              25
+Maximum number of members per shared IP group   25
+
+GET /limits
+ {
+   "limits" : {
+     "rate" : [
+       {
+	 "verb" : "POST",
+	 "URI" : "*",
+         "regex" : ".*",
+         "value" : 10,
+         "remaining" : 2,
+	 "unit" : "MINUTE",
+	 "resetTime" : 1244425439
+       },
+       {
+	 "verb" : "POST",
+         "URI" : "*/servers",
+	 "regex" : "^/servers",
+	 "value" : 50,
+	 "remaining" : 49,
+	 "unit" : "DAY",
+	 "resetTime" : 1244511839
+       },
+       {
+	 "verb" : "PUT",
+	 "URI" : "*",
+	 "regex" : ".*",
+	 "value" : 10,
+	 "remaining" : 2,
+	 "unit" : "MINUTE",
+	 "resetTime" : 1244425439
+       },
+       {
+	 "verb" : "GET",
+	 "URI" : "*changes-since*",
+	 "regex" : "changes-since",
+	 "value" : 3,
+	 "remaining" : 3,
+	 "unit" : "MINUTE",
+	 "resetTime" : 1244425439
+       },
+       {
+	 "verb" : "DELETE",
+	 "URI" : "*",
+	 "regex" : ".*",
+	 "value" : 100,
+	 "remaining" : 100,
+	 "unit" : "MINUTE",
+	 "resetTime" : 1244425439
+       }
+     ],
+     "absolute" : {
+       "maxTotalRAMSize" : 51200,
+       "maxIPGroups" : 50,
+       "maxIPGroupMembers" : 25
+     }
+   }
+ }
+
