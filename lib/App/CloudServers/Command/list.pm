@@ -4,7 +4,9 @@ use warnings;
 use 5.010_000;
 use App::CloudServers -command;
 
-sub usage_desc { "cloudservers.pl %o" }
+sub abstract { 'lists images, flavors, servers, requests remaining' }
+
+sub usage_desc { "%c list %o" }
 
 sub opt_spec {
   return (
@@ -18,6 +20,11 @@ sub opt_spec {
 sub validate_args {
   my ( $self, $opt, $args ) = @_;
   die $self->_usage_text if $opt->{help};
+  $self->usage_error('choose what you want to list') if (
+    !defined $opt->{flavors}
+    && !defined $opt->{images}
+    && !defined $opt->{servers}
+  );
   $self->usage_error("No args allowed") if @$args;
 }
 
