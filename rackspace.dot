@@ -1,0 +1,66 @@
+digraph G {
+
+  // rackspace COMMANDs:
+  "rackspace.pl" -> "cmd_create";
+  "rackspace.pl" -> "cmd_update";
+  "rackspace.pl" -> "cmd_destroy";
+  "rackspace.pl" -> "cmd_reboot";
+  "rackspace.pl" -> "cmd_list";
+  "rackspace.pl" -> "cmd_info";
+
+  // rackspace REBOOT --opts
+  "cmd_reboot" -> "cmd_reboot_opt_id";
+  "cmd_reboot" -> "cmd_reboot_opt_soft";
+  "cmd_reboot" -> "cmd_reboot_opt_hard";
+
+  // rackspace DESTROY --opts
+  "cmd_destroy" -> "cmd_destroy_opt_id";
+
+  // rackspace CREATE --opts
+  "cmd_create" -> "cmd_create_opt_name";
+  "cmd_create" -> "cmd_create_opt_imageid";
+  "cmd_create" -> "cmd_create_opt_flavorid";
+
+  // rackspace UPDATE --opts
+  "cmd_update" -> "cmd_update_opt_id";
+  "cmd_update" -> "cmd_update_opt_adminpass";
+
+  // rackspace LIST --opts
+  "cmd_list" -> "cmd_list_flavors";
+  "cmd_list" -> "cmd_list_images";
+  "cmd_list" -> "cmd_list_servers";
+
+  // rackspace INFO --opts
+  "cmd_info" -> "cmd_info_id";
+  "cmd_info" -> "cmd_info_private";
+  "cmd_info" -> "cmd_info_public";
+
+  cmd_create [label="create"];
+  cmd_update [label="update"];
+  cmd_destroy [label="destroy"];
+  cmd_reboot [label="reboot"];
+  cmd_list [label="list"];
+  cmd_info [label="info"];
+
+  cmd_destroy_opt_id [label="--id ID"];
+
+  cmd_reboot_opt_id [label="--id ID"];
+  cmd_reboot_opt_soft [label="--soft"];
+  cmd_reboot_opt_hard [label="--hard"];
+
+  cmd_create_opt_name [label="--name NAME"];
+  cmd_create_opt_imageid [label="--imageid ID"];
+  cmd_create_opt_flavorid [label="--flavorid ID"];
+
+  cmd_update_opt_id [label="--id ID"];
+  cmd_update_opt_adminpass [label="--pass \"password\""];
+
+  cmd_list_flavors [label="flavors"];
+  cmd_list_images [label="images"];
+  cmd_list_servers [label="servers"];
+
+  cmd_info_id [label="--id ID"];
+  cmd_info_private [label="--private"];
+  cmd_info_public [label="--public"];
+
+}
