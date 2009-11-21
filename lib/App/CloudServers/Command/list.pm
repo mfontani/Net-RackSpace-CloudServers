@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use 5.010_000;
 use App::CloudServers -command;
+use Net::RackSpace::CloudServers;
 
 sub abstract { 'lists images, flavors, servers, requests remaining' }
 
@@ -55,6 +56,38 @@ sub run {
 sub _list_flavors { say "Listing flavors"; }
 sub _list_images { say "Listing images"; }
 sub _list_servers { say "Listing servers"; }
-sub _list_limits { say "Listing limits"; }
+sub _list_limits {
+  my ($CS) = @_;
+  my $cs = $CS->limits;
+  if (defined $cs->{rate} && ref $cs->{rate} eq 'ARRAY') {
+    say "Rate limits:";
+    my $fmt = '  %-8s %-16s %-16s %-6s %-10s %-7s (%s) %s';
+    say sprintf($fmt,qw/verb URI regex value remaining units reset-time local-time/);
+    say '  --------+----------------+----------------+------+----------+',
+      '-------+------------+------------------------';
+    foreach my $rl (@{$cs->{rate}}) {
+      say sprintf($fmt,
+        $rl->{verb} // 'n/a',
+        $rl->{URI} // 'n/a',
+        $rl->{regex} // 'n/a',
+        $rl->{value} // 'n/a',
+        $rl->{remaining} // 'n/a',
+        $rl->{unit} // 'n/a',
+        $rl->{resetTime} // 'n/a',
+        defined $rl->{resetTime} ? scalar localtime($rl->{resetTime}) : 'n/a',
+      );
+    }
+  } else {
+    say "No rate info found or not an array: ", ref $cs->{rate};
+  }
+  if (defined $cs->{absolute} && ref $cs->{absolute} eq 'HASH') {
+    say "Absolute limits:";
+    foreach my $k (sort keys %{$cs->{absolute}}) {
+      say sprintf('  %-20s %s',$k,$cs->{absolute}->{$k} // 'n/a');
+    }
+  } else {
+    say "No absolute rate info found or not an hash: ", ref $cs->{absolute};
+  }
+}
 
 1;
