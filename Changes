@@ -1,5 +1,9 @@
 Revision history for Net-RackSpace-CloudServers
 
+0.09_00 2009-11-21 1712 GMT
+	Added server deletion, and script to do it
+	Corrected server creation
+
 0.08_00 2009-11-21 2241 GMT
 	Added Flavours class
 
