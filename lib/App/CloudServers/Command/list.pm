@@ -14,7 +14,7 @@ sub opt_spec {
     ['flavors','list possible flavors and their IDs'],
     ['images','list possible images and their IDs'],
     ['servers','list all your servers and their IDs'],
-    ['details','list detailed info for --servers'],
+    ['details','list detailed info for servers, flavors, or images'],
     ['limits','lists how many requests can still be done'],
     ['user','specify cloudservers API user, instead of $ENV{CLOUDSERVERS_USER}'],
     ['key','specify cloudservers API key, instead of $ENV{CLOUDSERVERS_KEY}'],
@@ -31,8 +31,8 @@ sub validate_args {
     && !defined $opt->{servers}
     && !defined $opt->{limits}
   );
-  $self->usage_error("--details is meaningless without --servers\n") if (
-    defined $opt->{details} && !defined $opt->{servers}
+  $self->usage_error("--details cannot be used for --limits\n") if (
+    defined $opt->{details} && defined $opt->{limits}
   );
   $opt->{details} //= 0;
   $self->usage_error("use --user or defined \$ENV{CLOUDSERVERS_USER} to use this command\n") if (
@@ -52,8 +52,8 @@ sub run {
     user => $opt->{user},
     key  => $opt->{key},
   );
-  _list_flavors($CS) if ( $opt->{flavors} );
-  _list_images($CS) if ( $opt->{images} );
+  _list_flavors($CS,$opt->{details}) if ( $opt->{flavors} );
+  _list_images($CS,$opt->{details}) if ( $opt->{images} );
   _list_servers($CS,$opt->{details}) if ( $opt->{servers} );
   _list_limits($CS) if ( $opt->{limits} );
 }
