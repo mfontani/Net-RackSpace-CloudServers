@@ -59,13 +59,13 @@ sub _list_servers { say "Listing servers"; }
 sub _list_limits {
   my ($CS) = @_;
   my $cs = $CS->limits;
-  if (defined $cs->{rate} && ref $cs->{rate} eq 'ARRAY') {
+  if (defined $cs->rate && ref $cs->rate eq 'ARRAY') {
     say "Rate limits:";
     my $fmt = '  %-8s %-16s %-16s %-6s %-10s %-7s (%s) %s';
     say sprintf($fmt,qw/verb URI regex value remaining units reset-time local-time/);
     say '  --------+----------------+----------------+------+----------+',
       '-------+------------+------------------------';
-    foreach my $rl (@{$cs->{rate}}) {
+    foreach my $rl (@{$cs->rate}) {
       say sprintf($fmt,
         $rl->{verb} // 'n/a',
         $rl->{URI} // 'n/a',
@@ -78,15 +78,11 @@ sub _list_limits {
       );
     }
   } else {
-    say "No rate info found or not an array: ", ref $cs->{rate};
+    say "No rate info found or not an array: ", ref $cs->rate;
   }
-  if (defined $cs->{absolute} && ref $cs->{absolute} eq 'HASH') {
-    say "Absolute limits:";
-    foreach my $k (sort keys %{$cs->{absolute}}) {
-      say sprintf('  %-20s %s',$k,$cs->{absolute}->{$k} // 'n/a');
-    }
-  } else {
-    say "No absolute rate info found or not an hash: ", ref $cs->{absolute};
+  say "Absolute limits:";
+  foreach my $k (qw/totalramsize maxipgroups maxipgroupmembers/) {
+    say sprintf('  %-20s %s',$k,$cs->$k // 'n/a');
   }
 }
 
