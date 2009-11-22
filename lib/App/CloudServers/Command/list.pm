@@ -24,21 +24,21 @@ sub opt_spec {
 sub validate_args {
   my ( $self, $opt, $args ) = @_;
   die $self->_usage_text if $opt->{help};
-  $self->usage_error('choose what you want to list') if (
+  $self->usage_error("choose what you want to list\n") if (
     !defined $opt->{flavors}
     && !defined $opt->{images}
     && !defined $opt->{servers}
     && !defined $opt->{limits}
   );
-  $self->usage_error('use --user or defined $ENV{CLOUDSERVERS_USER} to use this command') if (
+  $self->usage_error("use --user or defined \$ENV{CLOUDSERVERS_USER} to use this command\n") if (
     !defined $opt->{user} && !defined $ENV{CLOUDSERVERS_USER}
   );
-  $self->usage_error('use --key or defined $ENV{CLOUDSERVERS_KEY} to use this command') if (
+  $self->usage_error("use --key or defined \$ENV{CLOUDSERVERS_KEY} to use this command\n") if (
     !defined $opt->{key} && !defined $ENV{CLOUDSERVERS_KEY}
   );
   $opt->{user} //= $ENV{CLOUDSERVERS_USER};
   $opt->{key} //= $ENV{CLOUDSERVERS_KEY};
-  $self->usage_error("No args allowed") if @$args;
+  $self->usage_error("No args allowed\n") if @$args;
 }
 
 sub run {
