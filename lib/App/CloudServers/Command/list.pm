@@ -56,7 +56,48 @@ sub run {
   _list_limits( $CS, $opt->{table} ) if ( $opt->{limits} );
 }
 
-sub _list_flavors { say "Listing flavors"; }
+sub _list_flavors {
+  my ( $CS, $details, $use_table ) = @_;
+  my @flavors = $details ? $CS->get_flavor_detail() : $CS->get_flavor();
+  say "Listing flavors", $details ? ' details' : '';
+  my $table;
+  my $fmt;
+
+  if ($use_table) {
+    use Text::SimpleTable;
+    $table = Text::SimpleTable->new(
+      [ 4,  'id' ],
+      [ 14, 'name' ],
+      (
+        $details
+        ? (
+          [ 8, 'disk' ],
+          [ 8,  'ram' ],
+          )
+        : ()
+      )
+    );
+  } else {
+    $fmt = '  %-4s %-14s' . ( $details ? ' %-8s %-8s' : '' );
+    say
+      sprintf( $fmt, qw/id name/, $details ? qw/disk ram/ : undef );
+    say '  ----+--------------',
+      $details ? '+--------+--------+' : '';
+  }
+
+  foreach my $fla (@flavors) {
+    my @det =
+      map { $fla->$_ }
+      ( qw/id name/, ( $details ? (qw/disk ram/) : () ) );
+    if ($use_table) {
+      $table->row(@det);
+    } else {
+      say sprintf( $fmt, @det );
+    }
+  }
+  say $table->draw if $use_table;
+}
+
 sub _list_images  { say "Listing images"; }
 
 sub _list_servers {
