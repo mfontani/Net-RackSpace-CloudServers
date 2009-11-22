@@ -157,8 +157,8 @@ sub _list_servers {
         $details
         ? (
           [ 32, 'hostid' ],
-          [ 8,  'flavorid' ],
-          [ 7,  'imageid' ],
+          [ 18,  'flavor' ],
+          [ 28,  'image' ],
           [ 8,  'progress' ],
           [ 10, 'status' ]
           )
@@ -166,17 +166,25 @@ sub _list_servers {
       )
     );
   } else {
-    $fmt = '  %-8s %-12s' . ( $details ? ' %-32s %-8s %-7s %-8s %s' : '' );
+    $fmt = '  %-8s %-12s' . ( $details ? ' %-32s %-18s %-28s %-8s %s' : '' );
     say
-      sprintf( $fmt, qw/id name/, $details ? qw/hostid flavorid imageid progress status/ : undef );
+      sprintf( $fmt, qw/id name/, $details ? qw/hostid flavor image progress status/ : undef );
     say '  --------+------------',
-      $details ? '+--------------------------------+--------+-------+--------+--------------' : '';
+      $details ? '+--------------------------------+------------------'
+      . '+----------------------------+--------+--------------' : '';
   }
 
   foreach my $srv (@servers) {
-    my @det =
-      map { $srv->$_ // '' }
-      ( qw/id name/, ( $details ? (qw/hostid flavorid imageid progress status/) : () ) );
+    my $flavor;
+    $flavor = $srv->flavorid . ' ' . $CS->get_flavor($srv->flavorid)->name if ($details);
+    my $image;
+    $image = $srv->imageid . ' ' . $CS->get_image($srv->imageid)->name if ($details);
+    my @det = (
+      ( map { $srv->$_ // '' } ( qw/id name/ ) ),
+      $details ? (
+        $srv->hostid, $flavor, $image, $srv->progress, $srv->status
+      ) : ()
+    );
     if ($use_table) {
       $table->row(@det);
     } else {
