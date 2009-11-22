@@ -60,6 +60,21 @@ sub change_name {
   return $response;
 }
 
+sub delete_server {
+  my $self    = shift;
+  my $request = HTTP::Request->new(
+    'DELETE',
+    $self->cloudservers->server_management_url . '/servers/' . $self->id,
+    [
+      'X-Auth-Token' => $self->cloudservers->token,
+      'Content-Type' => 'application/json',
+    ],
+  );
+  my $response = $self->cloudservers->_request($request);
+  confess 'Unknown error' if $response->code != 202;
+  return;
+}
+
 sub create_server {
   my $self    = shift;
   my $request = HTTP::Request->new(
