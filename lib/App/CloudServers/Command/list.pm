@@ -15,6 +15,7 @@ sub opt_spec {
     [ 'images',  'list possible images and their IDs' ],
     [ 'servers', 'list all your servers and their IDs' ],
     [ 'details', 'list detailed info for servers, flavors, or images' ],
+    [ 'ips',     'enables --details, and also list servers IP addresses info' ],
     [ 'limits',  'lists how many requests can still be done' ],
     [ 'table',   'uses Text::SimpleTable to draw the report' ],
     [ 'user',    'specify cloudservers API user, instead of $ENV{CLOUDSERVERS_USER}' ],
@@ -34,6 +35,10 @@ sub validate_args {
   $self->usage_error("--details cannot be used for --limits\n")
     if ( defined $opt->{details} && defined $opt->{limits} );
   $opt->{details} //= 0;
+  $self->usage_error("--ips can be used for --servers only\n")
+    if ( defined $opt->{ips} && !defined $opt->{servers} );
+  $opt->{ips} //= 0;
+  $opt->{details} = 1 if ( $opt->{ips} );
   $self->usage_error("use --user or defined \$ENV{CLOUDSERVERS_USER} to use this command\n")
     if ( !defined $opt->{user} && !defined $ENV{CLOUDSERVERS_USER} );
   $self->usage_error("use --key or defined \$ENV{CLOUDSERVERS_KEY} to use this command\n")
@@ -52,7 +57,7 @@ sub run {
   );
   _list_flavors( $CS, $opt->{details}, $opt->{table} ) if ( $opt->{flavors} );
   _list_images( $CS, $opt->{details}, $opt->{table} ) if ( $opt->{images} );
-  _list_servers( $CS, $opt->{details}, $opt->{table} ) if ( $opt->{servers} );
+  _list_servers( $CS, $opt->{details}, $opt->{table}, $opt->{ips} ) if ( $opt->{servers} );
   _list_limits( $CS, $opt->{table} ) if ( $opt->{limits} );
 }
 
@@ -142,9 +147,9 @@ sub _list_images {
 }
 
 sub _list_servers {
-  my ( $CS, $details, $use_table ) = @_;
+  my ( $CS, $details, $use_table, $show_ips ) = @_;
   my @servers = $details ? $CS->get_server_detail() : $CS->get_server();
-  say "Listing servers", $details ? ' details' : '';
+  say "Listing servers", $details ? ' details' : '', $show_ips ? ' and IP addresses' : '';
   my $table;
   my $fmt;
 
@@ -156,7 +161,7 @@ sub _list_servers {
       (
         $details
         ? (
-          [ 32, 'hostid' ],
+          [ 32, $show_ips ? 'hostid and IPs' : 'hostid' ],
           [ 18,  'flavor' ],
           [ 28,  'image' ],
           [ 8,  'progress' ],
@@ -168,7 +173,7 @@ sub _list_servers {
   } else {
     $fmt = '  %-8s %-12s' . ( $details ? ' %-32s %-18s %-28s %-8s %s' : '' );
     say
-      sprintf( $fmt, qw/id name/, $details ? qw/hostid flavor image progress status/ : undef );
+      sprintf( $fmt, qw/id name/, $details ? ($show_ips?'hostid and IPs':'hostid', qw/flavor image progress status/) : undef );
     say '  --------+------------',
       $details ? '+--------------------------------+------------------'
       . '+----------------------------+--------+--------------' : '';
@@ -179,16 +184,31 @@ sub _list_servers {
     $flavor = $srv->flavorid . ' ' . $CS->get_flavor($srv->flavorid)->name if ($details);
     my $image;
     $image = $srv->imageid . ' ' . $CS->get_image($srv->imageid)->name if ($details);
+    my $hostip;
+    if ($show_ips) {
+      $hostip = [
+        'Public:  ' . join(' ', map { $_ } @{$srv->public_address}),
+        'Private: ' . join(' ', map { $_ } @{$srv->private_address})
+      ];
+    }
     my @det = (
       ( map { $srv->$_ // '' } ( qw/id name/ ) ),
       $details ? (
-        $srv->hostid, $flavor, $image, $srv->progress, $srv->status
+        $use_table
+        ? $srv->hostid . "\n" . join("\n",@$hostip)
+        : $srv->hostid,
+        $flavor, $image, $srv->progress, $srv->status
       ) : ()
     );
     if ($use_table) {
       $table->row(@det);
     } else {
       say sprintf( $fmt, @det );
+      if ($show_ips) {
+        foreach (@$hostip) {
+          say sprintf($fmt,'','',$_,'','','','','');
+        }
+      }
     }
   }
   say $table->draw if $use_table;
