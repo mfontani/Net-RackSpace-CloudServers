@@ -87,7 +87,7 @@ sub _list_flavors {
 
   foreach my $fla (@flavors) {
     my @det =
-      map { $fla->$_ }
+      map { $fla->$_ // '' }
       ( qw/id name/, ( $details ? (qw/disk ram/) : () ) );
     if ($use_table) {
       $table->row(@det);
@@ -175,7 +175,7 @@ sub _list_servers {
 
   foreach my $srv (@servers) {
     my @det =
-      map { $srv->$_ }
+      map { $srv->$_ // '' }
       ( qw/id name/, ( $details ? (qw/hostid flavorid imageid progress status/) : () ) );
     if ($use_table) {
       $table->row(@det);
