@@ -63,7 +63,7 @@ sub refresh {
 
 =head1 NAME
 
-Net::RackSpace::CloudServers::Limits- a RackSpace CloudServers Limits instance
+Net::RackSpace::CloudServers::Limits - a RackSpace CloudServers Limits instance
 
 =head1 SYNOPSIS
 
