@@ -172,6 +172,12 @@ Needs a Net::RackSpace::CloudServers object as B<cloudserver> parameter.
 
 This creates a real server based on a Server template object (TODO: will accept all the other build parameters).
 
+=head2 delete_server
+
+This will ask RackSpace to delete the cloud server instance specified in this object's ID from the system.
+This operation is irreversible. Please notice that all images created from this server (if any) will also
+be removed. This method doesn't return anything on success, and C<confess()>es on failure.
+
 =head2 change_name
 
 Changes the server's name to the new value given. Dies on error, or returns the response
