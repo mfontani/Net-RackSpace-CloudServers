@@ -16,6 +16,7 @@ sub opt_spec {
     ['servers','list all your servers and their IDs'],
     ['details','list detailed info for servers, flavors, or images'],
     ['limits','lists how many requests can still be done'],
+    ['table','uses Text::SimpleTable to draw the report'],
     ['user','specify cloudservers API user, instead of $ENV{CLOUDSERVERS_USER}'],
     ['key','specify cloudservers API key, instead of $ENV{CLOUDSERVERS_KEY}'],
     ['help','get help for this command'],
@@ -43,6 +44,7 @@ sub validate_args {
   );
   $opt->{user} //= $ENV{CLOUDSERVERS_USER};
   $opt->{key} //= $ENV{CLOUDSERVERS_KEY};
+  $opt->{table} //= 0;
   $self->usage_error("No args allowed\n") if @$args;
 }
 
@@ -52,57 +54,87 @@ sub run {
     user => $opt->{user},
     key  => $opt->{key},
   );
-  _list_flavors($CS,$opt->{details}) if ( $opt->{flavors} );
-  _list_images($CS,$opt->{details}) if ( $opt->{images} );
-  _list_servers($CS,$opt->{details}) if ( $opt->{servers} );
-  _list_limits($CS) if ( $opt->{limits} );
+  _list_flavors($CS,$opt->{details},$opt->{table}) if ( $opt->{flavors} );
+  _list_images($CS,$opt->{details},$opt->{table}) if ( $opt->{images} );
+  _list_servers($CS,$opt->{details},$opt->{table}) if ( $opt->{servers} );
+  _list_limits($CS,$opt->{table}) if ( $opt->{limits} );
 }
 
 sub _list_flavors { say "Listing flavors"; }
 sub _list_images { say "Listing images"; }
 
 sub _list_servers {
-  my ($CS,$details) = @_;
+  my ($CS,$details,$use_table) = @_;
   my @servers = $details ? $CS->get_server_detail() : $CS->get_server();
   say "Listing servers", $details ? ' details' : '';
+  my $table;
   my $fmt;
-  if ( $details ) {
-    $fmt = '  %-8s %-12s %-32s %-8s %-7s %-8s %s';
-    say sprintf($fmt,qw/id name hostid flavorid imageid progress status/);
-    say '  --------+------------+--------------------------------+--------+-------+--------+--------------';
+  #use Text::SimpleTable;
+  if ($use_table) {
+    use Text::SimpleTable;
+    $table = Text::SimpleTable->new(
+      [8,'id'],[12,'name'],
+      ($details?([32,'hostid'],[8,'flavorid'],[7,'imageid'],[8,'progress'],[10,'status']):())
+    );
   } else {
-    $fmt = '  %-8s %s';
-    say sprintf($fmt,qw/id name/);
-    say '  --------+------------';
+    $fmt = '  %-8s %-12s' . ($details?' %-32s %-8s %-7s %-8s %s':'');
+    say sprintf($fmt,qw/id name/,$details?qw/hostid flavorid imageid progress status/:undef);
+    say '  --------+------------',
+      $details ? '+--------------------------------+--------+-------+--------+--------------' : '';
   }
   foreach my $srv ( @servers ) {
-    say sprintf($fmt,
-      map { $srv->$_ } (qw/id name/, ($details ? (qw/hostid flavorid imageid progress status/) : ())),
+    my @det = map { $srv->$_ } (
+      qw/id name/, ($details ? (qw/hostid flavorid imageid progress status/) : ())
     );
+    if ($use_table) {
+      $table->row(@det);
+    } else {
+      say sprintf($fmt, @det);
+    }
   }
+  say $table->draw if $use_table;
 }
 
 sub _list_limits {
-  my ($CS) = @_;
+  my ($CS,$use_table) = @_;
   my $cs = $CS->limits;
   if (defined $cs->rate && ref $cs->rate eq 'ARRAY') {
     say "Rate limits:";
-    my $fmt = '  %-8s %-16s %-16s %-6s %-10s %-7s (%s) %s';
-    say sprintf($fmt,qw/verb URI regex value remaining units reset-time local-time/);
-    say '  --------+----------------+----------------+------+----------+',
-      '-------+------------+------------------------';
+    my $table;
+    my $fmt;
+    if ( $use_table ) {
+      use Text::SimpleTable;
+      $table = Text::SimpleTable->new(
+        [6,'verb'],[16,'URI'],[16,'regex'],[5,'value'],[4,'left'],
+        [7,'progress'],[35,'reset-time (local time)']
+      );
+    } else {
+      $fmt = '  %-8s %-16s %-16s %-6s %-6s %-6s (%s) %s';
+      say sprintf($fmt,qw/verb URI regex value left units reset-time local-time/);
+      say '  --------+----------------+----------------+------+------+',
+        '------+------------+------------------------';
+    }
     foreach my $rl (@{$cs->rate}) {
-      say sprintf($fmt,
+      my @reset_time = (
+        $rl->{resetTime} // 'n/a',
+        defined $rl->{resetTime} ? scalar localtime($rl->{resetTime}) : 'n/a'
+      );
+      my @det = (
         $rl->{verb} // 'n/a',
         $rl->{URI} // 'n/a',
         $rl->{regex} // 'n/a',
         $rl->{value} // 'n/a',
         $rl->{remaining} // 'n/a',
         $rl->{unit} // 'n/a',
-        $rl->{resetTime} // 'n/a',
-        defined $rl->{resetTime} ? scalar localtime($rl->{resetTime}) : 'n/a',
+        $use_table ? join(' ', @reset_time) : @reset_time
       );
+      if ($use_table) {
+        $table->row(@det);
+      } else {
+        say sprintf($fmt,@det);
+      }
     }
+    say $table->draw if $use_table;
   } else {
     say "No rate info found or not an array: ", ref $cs->rate;
   }
