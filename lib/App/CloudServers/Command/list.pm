@@ -11,16 +11,16 @@ sub usage_desc { "%c list %o" }
 
 sub opt_spec {
   return (
-    [ 'flavors', 'list possible flavors and their IDs' ],
-    [ 'images',  'list possible images and their IDs' ],
-    [ 'servers', 'list all your servers and their IDs' ],
-    [ 'details', 'list detailed info for servers, flavors, or images' ],
-    [ 'ips',     'enables --details, and also list servers IP addresses info' ],
-    [ 'limits',  'lists how many requests can still be done' ],
-    [ 'table',   'uses Text::SimpleTable to draw the report' ],
-    [ 'user',    'specify cloudservers API user, instead of $ENV{CLOUDSERVERS_USER}' ],
-    [ 'key',     'specify cloudservers API key, instead of $ENV{CLOUDSERVERS_KEY}' ],
-    [ 'help',    'get help for this command' ],
+    [ 'flavors|f', 'list possible flavors and their IDs' ],
+    [ 'images|i',  'list possible images and their IDs' ],
+    [ 'servers|s', 'list all your servers and their IDs' ],
+    [ 'details|d', 'list detailed info for servers, flavors, or images' ],
+    [ 'ips|p',     'enables --details, and also list servers IP addresses info' ],
+    [ 'limits|l',  'lists how many requests can still be done' ],
+    [ 'table|t',   'uses Text::SimpleTable to draw the report' ],
+    [ 'user',      'specify cloudservers API user, instead of $ENV{CLOUDSERVERS_USER}' ],
+    [ 'key',       'specify cloudservers API key, instead of $ENV{CLOUDSERVERS_KEY}' ],
+    [ 'help|h',    'get help for this command' ],
   );
 }
 
