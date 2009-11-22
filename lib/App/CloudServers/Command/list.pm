@@ -98,7 +98,48 @@ sub _list_flavors {
   say $table->draw if $use_table;
 }
 
-sub _list_images  { say "Listing images"; }
+sub _list_images {
+  my ( $CS, $details, $use_table ) = @_;
+  my @images = $details ? $CS->get_image_detail() : $CS->get_image();
+  say "Listing images", $details ? ' details' : '';
+  my $table;
+  my $fmt;
+
+  if ($use_table) {
+    use Text::SimpleTable;
+    $table = Text::SimpleTable->new(
+      [ 6,  'id' ],
+      [ 26, 'name' ],
+      (
+        $details
+        ? (
+          [ 7, 'status' ],
+          [ 25, 'created' ],
+          [ 25, 'updated' ],
+          )
+        : ()
+      )
+    );
+  } else {
+    $fmt = '  %-6s %-26s' . ( $details ? ' %-7s %-25s %-25s' : '' );
+    say
+      sprintf( $fmt, qw/id name/, $details ? qw/status created updated/ : undef );
+    say '  ------+--------------------------',
+      $details ? '+-------+-------------------------+-------------------------' : '';
+  }
+
+  foreach my $img (@images) {
+    my @det =
+      map { $img->$_ // '' }
+      ( qw/id name/, ( $details ? (qw/status created updated/) : () ) );
+    if ($use_table) {
+      $table->row(@det);
+    } else {
+      say sprintf( $fmt, @det );
+    }
+  }
+  say $table->draw if $use_table;
+}
 
 sub _list_servers {
   my ( $CS, $details, $use_table ) = @_;
