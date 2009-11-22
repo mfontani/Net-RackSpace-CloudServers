@@ -32,6 +32,8 @@ digraph G {
   "cmd_list" -> "cmd_list_limits";
   "cmd_list" -> "cmd_list_opt_details";
   "cmd_list" -> "cmd_list_opt_table";
+  "cmd_list_servers" -> "cmd_list_opt_ips";
+  //"cmd_list_opt_ips" -> "cmd_list_opt_details";
 
   // rackspace INFO --opts
   "cmd_info" -> "cmd_info_id";
@@ -64,6 +66,7 @@ digraph G {
   cmd_list_limits [label="--limits"];
   cmd_list_opt_details [label="--details"];
   cmd_list_opt_table [label="--table"];
+  cmd_list_opt_ips [label="--ips"];
 
   cmd_info_id [label="--id ID"];
   cmd_info_private [label="--private"];
