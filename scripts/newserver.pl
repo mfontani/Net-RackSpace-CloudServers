@@ -42,7 +42,7 @@ my $srv;
 }
 
 $Net::RackSpace::CloudServers::DEBUG = 0;
-my $adminpass = $srv->adminpass; # will not be returned afterwards!
+my $adminpass = $srv->adminpass;    # will not be returned afterwards!
 print "Created server ID ", $srv->id, ", root password is: ", $adminpass, "\n";
 print "Available at public IP: @{$srv->public_address}\n";
 {

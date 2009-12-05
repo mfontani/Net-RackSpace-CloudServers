@@ -20,13 +20,16 @@ has 'key'     => ( is => 'ro', isa => 'Str',            required => 1 );
 has 'timeout' => ( is => 'ro', isa => 'Num',            required => 0, default => 30 );
 has 'ua'      => ( is => 'rw', isa => 'LWP::UserAgent', required => 0 );
 
-has 'limits'  => ( is => 'rw', isa => 'Net::RackSpace::CloudServers::Limits', lazy => 1, required => 1,
-  default => sub {
+has 'limits' => (
+  is       => 'rw',
+  isa      => 'Net::RackSpace::CloudServers::Limits',
+  lazy     => 1,
+  required => 1,
+  default  => sub {
     my ($self) = @_;
-    return Net::RackSpace::CloudServers::Limits->new(
-      cloudservers => $self,
-    );
-});
+    return Net::RackSpace::CloudServers::Limits->new( cloudservers => $self, );
+  }
+);
 
 has 'server_management_url' => (
   is       => 'rw',
