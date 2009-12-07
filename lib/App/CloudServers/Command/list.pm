@@ -233,7 +233,7 @@ sub _list_servers {
       if ( $opt->{ips} ) {
         foreach (@$hostip) {
           if ( $opt->{quiet} ) {
-            say sprintf( '%s "%s"', $srv->id, $_ );
+            say sprintf( '%s %s', $srv->id, $_ );
           } else {
             say sprintf( $fmt, '', '', $_, '', '', '', '', '' );
           }
