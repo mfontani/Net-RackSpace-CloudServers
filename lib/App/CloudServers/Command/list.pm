@@ -33,12 +33,17 @@ sub validate_args {
     && !defined $opt->{images}
     && !defined $opt->{servers}
     && !defined $opt->{limits} );
+  foreach (qw/flavors images servers limits/) {
+    $opt->{$_} = 0 unless defined $opt->{$_};
+  }
+  $self->usage_error("Choose only one entity to be listed")
+    if ( $opt->{flavors} + $opt->{images} + $opt->{servers} + $opt->{limits} > 1 );
   $self->usage_error("--details cannot be used for --limits\n")
-    if ( defined $opt->{details} && defined $opt->{limits} );
+    if ( $opt->{details} && $opt->{limits} );
   $opt->{details} //= 0;
   $opt->{quiet}   //= 0;
   $self->usage_error("--ips can be used for --servers only\n")
-    if ( defined $opt->{ips} && !defined $opt->{servers} );
+    if ( $opt->{ips} && !$opt->{servers} );
   $opt->{ips} //= 0;
   $opt->{details} = 1 if ( $opt->{ips} );
   $self->usage_error("use --user or defined \$ENV{CLOUDSERVERS_USER} to use this command\n")
@@ -145,7 +150,8 @@ sub _list_images {
 sub _list_servers {
   my ( $CS, $opt ) = @_;
   my @servers = $opt->{details} ? $CS->get_server_detail() : $CS->get_server();
-  say "Listing servers", $opt->{details} ? ' details' : '', $opt->{ips} ? ' and IP addresses' : '';
+  say "Listing servers", $opt->{details} ? ' details' : '', $opt->{ips} ? ' and IP addresses' : ''
+    unless $opt->{quiet};
   my $table;
   my $fmt;
   my $details = $opt->{details};
