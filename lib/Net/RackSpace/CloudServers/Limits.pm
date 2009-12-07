@@ -2,8 +2,7 @@ package Net::RackSpace::CloudServers::Limits;
 use warnings;
 use strict;
 our $DEBUG = 0;
-use Moose;
-use MooseX::StrictConstructor;
+use Any::Moose;
 use HTTP::Request;
 use JSON;
 use YAML;
@@ -14,7 +13,7 @@ has 'maxipgroups'  => ( is => 'rw', isa => 'Int', );
 has 'maxipgroupmembers' => ( is => 'rw', isa => 'Int', );
 has 'rate'              => ( is => 'rw', isa => 'Maybe[ArrayRef]', );
 
-no Moose;
+no Any::Moose;
 __PACKAGE__->meta->make_immutable();
 
 sub BUILD {

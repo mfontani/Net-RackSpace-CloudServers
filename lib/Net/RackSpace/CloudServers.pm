@@ -1,8 +1,7 @@
 package Net::RackSpace::CloudServers;
 use warnings;
 use strict;
-use Moose;
-use MooseX::StrictConstructor;
+use Any::Moose;
 use Net::RackSpace::CloudServers::Flavor;
 use Net::RackSpace::CloudServers::Server;
 use Net::RackSpace::CloudServers::Image;
@@ -44,7 +43,7 @@ has 'storage_url' => (
 has 'cdn_management_url' => ( is => 'rw', isa => 'Str', required => 0 );
 has 'token'              => ( is => 'rw', isa => 'Str', required => 0 );
 
-no Moose;
+no Any::Moose;
 __PACKAGE__->meta->make_immutable();
 
 # copied from Net::Mosso::CloudFiles

@@ -2,8 +2,7 @@ package Net::RackSpace::CloudServers::Server;
 use warnings;
 use strict;
 our $DEBUG = 0;
-use Moose;
-use MooseX::StrictConstructor;
+use Any::Moose;
 use HTTP::Request;
 use JSON;
 use YAML;
@@ -21,7 +20,7 @@ has 'public_address'  => ( is => 'ro', isa => 'Maybe[ArrayRef[Str]]',         re
 has 'private_address' => ( is => 'ro', isa => 'Maybe[ArrayRef[Str]]',         required => 1 );
 has 'metadata'        => ( is => 'ro', isa => 'Maybe[HashRef]',               required => 1 );
 
-no Moose;
+no Any::Moose;
 __PACKAGE__->meta->make_immutable();
 
 sub change_root_password {
@@ -132,7 +131,7 @@ Net::RackSpace::CloudServers::Server - a RackSpace CloudServers Server instance
     cloudservers => $cs,
     id => '1', name => 'test',
   );
-  # get list: 
+  # get list:
   my @servers = $cs->get_server;
   foreach my $server ( @servers ) {
     print 'Have server ', $server->name, ' id ', $server->id, "\n";
@@ -164,7 +163,7 @@ The constructor creates a Server object, see L<create_server> to create a server
     cloudserver => $cs
     id => 'id', name => 'name',
   );
-  
+
 This normally gets created for you by L<Net::RackSpace::Cloudserver>'s L<get_server> or L<get_server_detail> methods.
 Needs a Net::RackSpace::CloudServers object as B<cloudserver> parameter.
 
