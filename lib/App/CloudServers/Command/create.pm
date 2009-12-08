@@ -11,12 +11,12 @@ sub usage_desc { "%c create %o" }
 
 sub opt_spec {
   return (
-    [ 'name|n', 'specify the new server\'s name' ],
+    [ 'name|n=s', 'specify the new server\'s name' ],
     [ 'wait|w', '(default) wait until the server has been successfully created', { default => 1 } ],
-    [ 'imageid|i',    'specify the ID of the image used to create the server' ],
-    [ 'imagename|I',  'specify the name of the image used to create the server' ],
-    [ 'flavorid|f',   'specify the ID of the flavor used to create the server' ],
-    [ 'flavorname|F', 'specify the name of the flavor used to create the server' ],
+    [ 'imageid|i=i',    'specify the ID of the image used to create the server' ],
+    [ 'imagename|I=s',  'specify the name of the image used to create the server' ],
+    [ 'flavorid|f=i',   'specify the ID of the flavor used to create the server' ],
+    [ 'flavorname|F=s', 'specify the name of the flavor used to create the server' ],
     [ 'metadata|m=s%', 'specify max 5 255B string metadata keys/values', { default => {} } ],
     [ 'path|p=s%',   'specify max 5 10kB max files to be pushed to the server', { default => {} } ],
     [ 'groupid|g=s', 'specify shared ip group ID for server',                   { default => '' } ],
