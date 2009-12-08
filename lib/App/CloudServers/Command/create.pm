@@ -33,6 +33,10 @@ sub validate_args {
   die $self->_usage_text if $opt->{help};
   use YAML;
   warn "Options specified: ", Dump($opt);
+  $self->usage_error("use --user or defined \$ENV{CLOUDSERVERS_USER} to use this command\n")
+    if ( !defined $opt->{user} && !defined $ENV{CLOUDSERVERS_USER} );
+  $self->usage_error("use --key or defined \$ENV{CLOUDSERVERS_KEY} to use this command\n")
+    if ( !defined $opt->{key} && !defined $ENV{CLOUDSERVERS_KEY} );
   if ( !defined $opt->{name} || !length $opt->{name} ) {
     $self->usage_error("Specify a --name for the new server\n");
   }
@@ -63,10 +67,6 @@ sub validate_args {
       unless ( -s $opt->{path}->{$f} <= 10_000 );
   }
   die "NOT IMPLEMENTED\n";
-  $self->usage_error("use --user or defined \$ENV{CLOUDSERVERS_USER} to use this command\n")
-    if ( !defined $opt->{user} && !defined $ENV{CLOUDSERVERS_USER} );
-  $self->usage_error("use --key or defined \$ENV{CLOUDSERVERS_KEY} to use this command\n")
-    if ( !defined $opt->{key} && !defined $ENV{CLOUDSERVERS_KEY} );
 
   # TODO: groupid
   # TODO: check image id or name exist
