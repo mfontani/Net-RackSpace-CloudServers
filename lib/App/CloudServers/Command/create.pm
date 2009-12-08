@@ -132,7 +132,44 @@ sub run {
   my $CS      = $opt->{__RACKSPACE_CLOUDSERVERS};
   my @images  = @{ $opt->{__RACKSPACE_CLOUDSERVERS_IMAGES} };
   my @flavors = @{ $opt->{__RACKSPACE_CLOUDSERVERS_FLAVORS} };
-  say "NOT IMPLEMENTED";
+  say "Creating new server..." if ( $opt->{verbose} );
+  my $newserver;
+  {
+    my $tmp = Net::RackSpace::CloudServers::Server->new(
+      cloudservers    => $CS,
+      name            => $opt->{name},
+      flavorid        => $opt->{flavorid},
+      imageid         => $opt->{imageid},
+      id              => 0,
+      status          => undef,
+      hostid          => undef,
+      progress        => undef,
+      public_address  => undef,
+      private_address => undef,
+      metadata        => undef,
+      adminpass       => undef,
+    );
+    $newserver = $tmp->create_server();
+  }
+  my $adminpass = $newserver->adminpass;    # will not be returned afterwards!
+  say "Created server ID ", $newserver->id;
+  say "root password: ",    $adminpass;
+  say "Public IP: @{$newserver->public_address}";
+  say "Private IP: @{$newserver->private_address}";
+  if ( $opt->{wait} ) {
+    local $| = 1;
+    do {
+      my @tmpservers = $CS->get_server_detail();
+      $newserver = ( grep { $_->name eq $opt->{name} } @tmpservers )[0];
+      print "\rServer status: ", $newserver->status // '?', " progress: ",
+        $newserver->progress // '?';
+      if ( ( $newserver->status // '' ) ne 'ACTIVE' ) {
+        print " sleeping.." if ( $opt->{verbose} );
+        sleep 2;
+      }
+    } while ( ( $newserver->status // '' ) ne 'ACTIVE' );
+  }
+  say "\nServer now available!";
 }
 
 1;
