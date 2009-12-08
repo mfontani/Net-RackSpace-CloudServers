@@ -12,7 +12,9 @@ sub usage_desc { "%c create %o" }
 sub opt_spec {
   return (
     [ 'name|n=s', 'specify the new server\'s name' ],
-    [ 'wait|w', '(default) wait until the server has been successfully created', { default => 1 } ],
+    [
+      'wait|w!', '(default) wait until the server has been successfully created', { default => 1 }
+    ],
     [ 'imageid|i=i',    'specify the ID of the image used to create the server' ],
     [ 'imagename|I=s',  'specify the name of the image used to create the server' ],
     [ 'flavorid|f=i',   'specify the ID of the flavor used to create the server' ],
