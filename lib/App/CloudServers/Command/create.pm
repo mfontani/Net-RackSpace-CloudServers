@@ -136,18 +136,10 @@ sub run {
   my $newserver;
   {
     my $tmp = Net::RackSpace::CloudServers::Server->new(
-      cloudservers    => $CS,
-      name            => $opt->{name},
-      flavorid        => $opt->{flavorid},
-      imageid         => $opt->{imageid},
-      id              => 0,
-      status          => undef,
-      hostid          => undef,
-      progress        => undef,
-      public_address  => undef,
-      private_address => undef,
-      metadata        => undef,
-      adminpass       => undef,
+      cloudservers => $CS,
+      name         => $opt->{name},
+      flavorid     => $opt->{flavorid},
+      imageid      => $opt->{imageid},
     );
     $newserver = $tmp->create_server();
   }
