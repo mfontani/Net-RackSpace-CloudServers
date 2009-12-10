@@ -1,5 +1,8 @@
 Revision history for Net-RackSpace-CloudServers
 
+0.09_40 2009-12-10 2124 GMT
+	Now able to create and delete backup images
+
 0.09_20 2009-11-23 1840 GMT
 	Added perl 5.10 as required
 
