@@ -13,6 +13,6 @@ my $CS = Net::RackSpace::CloudServers->new(
   key  => $key,
 );
 
-$CS->get_image;
-$CS->get_image_detail(2);
+#$CS->get_image;
+#$CS->get_image_detail(2);
 $CS->get_image_detail;

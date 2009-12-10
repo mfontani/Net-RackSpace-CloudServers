@@ -6,6 +6,7 @@ use Any::Moose;
 use HTTP::Request;
 use JSON;
 use YAML;
+use Net::RackSpace::CloudServers::Image;
 
 has 'cloudservers' => ( is => 'rw', isa => 'Net::RackSpace::CloudServers', required => 1 );
 has 'id'       => ( is => 'ro', isa => 'Int',        required => 1, default => 0 );
@@ -74,6 +75,45 @@ sub delete_server {
   my $response = $self->cloudservers->_request($request);
   confess 'Unknown error' if $response->code != 202;
   return;
+}
+
+sub create_image {
+  my $self    = shift;
+  my $imgname = shift;
+  my $request = HTTP::Request->new(
+    'POST',
+    $self->cloudservers->server_management_url . '/images',
+    [
+      'X-Auth-Token' => $self->cloudservers->token,
+      'Content-Type' => 'application/json',
+    ],
+    to_json(
+      {
+        image => {
+          serverId => $self->id,
+          name     => $imgname,
+        }
+      }
+    )
+  );
+  my $response = $self->cloudservers->_request($request);
+  if ( $response->code != 202 ) {
+    confess 'Unknown error ' . $response->code, "\n", Dump( $response->content );
+  }
+  my $hash_response = from_json( $response->content );
+  if ( !defined $hash_response->{image} ) {
+    confess 'response does not contain "image":', Dump($hash_response);
+  }
+  return Net::RackSpace::CloudServers::Image->new(
+    cloudservers => $self->cloudservers,
+    id           => $hash_response->{image}->{id},
+    serverid     => $hash_response->{image}->{serverId},
+    name         => $hash_response->{image}->{name},
+    created      => $hash_response->{image}->{created},
+    status       => $hash_response->{image}->{status},
+    progress     => $hash_response->{image}->{status},
+    updated      => undef,
+  );
 }
 
 sub create_server {
@@ -190,6 +230,13 @@ Changes the server's name to the new value given. Dies on error, or returns the 
 Changes the server's root password to the new value given. Dies on error, or returns the response
 
   $srv->change_root_password('toor');
+
+=head2 create_image
+
+Creates a named backup image of the current server. Returns the newly created
+C<Net::RackSpace::CloudServers::Image> object, which includes the new image's C<id>.
+
+  $srv->create_image("test backup 001");
 
 =head1 ATTRIBUTES
 

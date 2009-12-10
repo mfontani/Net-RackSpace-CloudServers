@@ -282,6 +282,7 @@ sub get_image {
     ? ( defined $id ? '/images/' . $id : '/images/detail' )
     : ( defined $id ? '/images/' . $id : '/images' )
   );
+  $uri .= '?changes_since=0';
   my $request = HTTP::Request->new(
     'GET',
     $self->server_management_url . $uri,
@@ -330,6 +331,22 @@ sub get_image_detail {
   my $self = shift;
   my $id   = shift;
   return $self->get_image( $id, 1 );
+}
+
+sub delete_image {
+  my $self    = shift;
+  my $id      = shift;
+  my $request = HTTP::Request->new(
+    'DELETE',
+    $self->server_management_url . '/images/' . $id,
+    [
+      'X-Auth-Token' => $self->token,
+      'Content-Type' => 'application/json',
+    ],
+  );
+  my $response = $self->_request($request);
+  confess 'Unknown error ' . $response->code unless ( $response->code ~~ [ 202, 204 ] );
+  return;
 }
 
 =head1 NAME
