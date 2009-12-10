@@ -7,18 +7,20 @@ use HTTP::Request;
 use JSON;
 use YAML;
 
-has 'cloudservers'    => ( is => 'rw', isa => 'Net::RackSpace::CloudServers', required => 1 );
-has 'id'              => ( is => 'ro', isa => 'Int',                          required => 1 );
-has 'name'            => ( is => 'ro', isa => 'Str',                          required => 1 );
-has 'imageid'         => ( is => 'ro', isa => 'Maybe[Int]',                   required => 1 );
-has 'flavorid'        => ( is => 'ro', isa => 'Maybe[Int]',                   required => 1 );
-has 'hostid'          => ( is => 'ro', isa => 'Maybe[Str]',                   required => 1 );
-has 'status'          => ( is => 'ro', isa => 'Maybe[Str]',                   required => 1 );
-has 'adminpass'       => ( is => 'ro', isa => 'Maybe[Str]',                   required => 1 );
-has 'progress'        => ( is => 'ro', isa => 'Maybe[Str]',                   required => 1 );
-has 'public_address'  => ( is => 'ro', isa => 'Maybe[ArrayRef[Str]]',         required => 1 );
-has 'private_address' => ( is => 'ro', isa => 'Maybe[ArrayRef[Str]]',         required => 1 );
-has 'metadata'        => ( is => 'ro', isa => 'Maybe[HashRef]',               required => 1 );
+has 'cloudservers' => ( is => 'rw', isa => 'Net::RackSpace::CloudServers', required => 1 );
+has 'id'       => ( is => 'ro', isa => 'Int',        required => 1, default => 0 );
+has 'name'     => ( is => 'ro', isa => 'Str',        required => 1 );
+has 'imageid'  => ( is => 'ro', isa => 'Maybe[Int]', required => 1 );
+has 'flavorid' => ( is => 'ro', isa => 'Maybe[Int]', required => 1 );
+has 'hostid'    => ( is => 'ro', isa => 'Maybe[Str]', required => 1, default => undef );
+has 'status'    => ( is => 'ro', isa => 'Maybe[Str]', required => 1, default => undef );
+has 'adminpass' => ( is => 'ro', isa => 'Maybe[Str]', required => 1, default => undef );
+has 'progress'  => ( is => 'ro', isa => 'Maybe[Str]', required => 1, default => undef );
+has 'public_address' =>
+  ( is => 'ro', isa => 'Maybe[ArrayRef[Str]]', required => 1, default => undef );
+has 'private_address' =>
+  ( is => 'ro', isa => 'Maybe[ArrayRef[Str]]', required => 1, default => undef );
+has 'metadata' => ( is => 'ro', isa => 'Maybe[HashRef]', required => 1, default => undef );
 
 no Any::Moose;
 __PACKAGE__->meta->make_immutable();
@@ -165,7 +167,7 @@ The constructor creates a Server object, see L<create_server> to create a server
   );
 
 This normally gets created for you by L<Net::RackSpace::Cloudserver>'s L<get_server> or L<get_server_detail> methods.
-Needs a Net::RackSpace::CloudServers object as B<cloudserver> parameter.
+Needs a Net::RackSpace::CloudServers object as B<cloudservers> parameter.
 
 =head2 create_server
 
