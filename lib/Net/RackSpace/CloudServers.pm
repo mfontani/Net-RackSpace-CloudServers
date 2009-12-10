@@ -438,6 +438,11 @@ returns an array of L<Net::RackSpace::CloudServers::Image>. All details are retu
 B<serverid>, B<updated>, B<created>, B<status> and B<progress>. If an ID is passed as parameter,
 it will return a L<Net::RackSpace::CloudServers::Image> object with all details filled in.
 
+=head2 delete_image
+
+Deletes a previously created backup image. Needs the image ID passed as parameter, returns undef
+in case of success or confess()es in case of error.
+
 =head1 AUTHOR
 
 Marco Fontani, C<< <mfontani at cpan.org> >>
