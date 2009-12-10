@@ -25,18 +25,10 @@ $Net::RackSpace::CloudServers::DEBUG = 1;
 my $srv;
 {
   my $tmp = Net::RackSpace::CloudServers::Server->new(
-    cloudservers    => $CS,
-    name            => 'perlmfapitest',
-    flavorid        => ( grep { $_->ram == 256 } @flavors )[0]->id,
-    imageid         => ( grep { $_->name =~ /karmic/ } @images )[0]->id,
-    id              => 0,
-    status          => undef,
-    hostid          => undef,
-    progress        => undef,
-    public_address  => undef,
-    private_address => undef,
-    metadata        => undef,
-    adminpass       => undef,
+    cloudservers => $CS,
+    name         => 'perlmfapitest',
+    flavorid     => ( grep { $_->ram == 256 } @flavors )[0]->id,
+    imageid      => ( grep { $_->name =~ /karmic/ } @images )[0]->id,
   );
   $srv = $tmp->create_server();
 }
