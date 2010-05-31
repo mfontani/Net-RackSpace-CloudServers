@@ -162,7 +162,7 @@ sub get_server {
     [ 'X-Auth-Token' => $self->token ]
   );
   my $response = $self->_request($request);
-  return if $response->code == 204;
+  return if $response->code ~~ [ 204, 404 ];
   confess 'Unknown error' . $response->code unless ( $response->code ~~ [ 200, 203 ] );
   my @servers;
   my $hash_response = from_json( $response->content );
