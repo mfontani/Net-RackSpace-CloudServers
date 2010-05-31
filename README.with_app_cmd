@@ -1,0 +1,6 @@
+NOTE: This branch *will* be rebased to master on a regular basis.
+
+This branch implements a command-line interface to the Rackspace
+CloudServers API, which is developed on the master branch.
+
+The command-line interface uses App::Cmd.
