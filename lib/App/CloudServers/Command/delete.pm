@@ -51,7 +51,7 @@ sub run {
   my $CS     = $opt->{__RACKSPACE_CLOUDSERVERS};
   my $server = $opt->{__RACKSPACE_CLOUDSERVERS_SERVER};
   say "Deleting server #", $server->id, " (", $server->name, ")..." if ( $opt->{verbose} );
-  # TODO add $server->delete_server();
+  $server->delete_server;
   say "Server deleted";
 }
 
