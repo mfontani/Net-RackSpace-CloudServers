@@ -29,6 +29,7 @@ my $srv;
     name         => 'perlmfapitest',
     flavorid     => ( grep { $_->ram == 256 } @flavors )[0]->id,
     imageid      => ( grep { $_->name =~ /karmic/ } @images )[0]->id,
+    personality  => [ { path => '/root/test.txt', contents => 'dGVzdCAxMjMK' } ], # "test 123\n"
   );
   $srv = $tmp->create_server();
 }
