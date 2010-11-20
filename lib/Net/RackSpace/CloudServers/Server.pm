@@ -132,8 +132,8 @@ sub create_server {
           name     => $self->name,
           imageId  => int $self->imageid,
           flavorId => int $self->flavorid,
-          defined $self->metadata    ? metadata    => $self->metadata    : (),
-          defined $self->personality ? personality => $self->personality : (),
+          defined $self->metadata    ? (metadata    => $self->metadata    ) : (),
+          defined $self->personality ? (personality => $self->personality ) : (),
         }
       }
     )
