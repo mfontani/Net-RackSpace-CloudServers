@@ -22,6 +22,7 @@ has 'public_address' =>
 has 'private_address' =>
   ( is => 'ro', isa => 'Maybe[ArrayRef[Str]]', required => 1, default => undef );
 has 'metadata' => ( is => 'ro', isa => 'Maybe[HashRef]', required => 1, default => undef );
+has 'personality' => ( is => 'ro', isa => 'Maybe[ArrayRef]', required => 1, default => undef );
 
 no Any::Moose;
 __PACKAGE__->meta->make_immutable();
@@ -131,6 +132,8 @@ sub create_server {
           name     => $self->name,
           imageId  => int $self->imageid,
           flavorId => int $self->flavorid,
+          defined $self->metadata    ? metadata    => $self->metadata    : (),
+          defined $self->personality ? personality => $self->personality : (),
         }
       }
     )
@@ -157,6 +160,7 @@ sub create_server {
     public_address  => $hserver->{addresses}->{public},
     private_address => $hserver->{addresses}->{private},
     metadata        => $hserver->{metadata},
+    personality     => $hserver->{personality},
   );
 }
 
