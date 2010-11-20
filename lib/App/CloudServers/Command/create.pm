@@ -4,6 +4,7 @@ use warnings;
 use 5.010_000;
 use App::CloudServers -command;
 use Net::RackSpace::CloudServers;
+use MIME::Base64;
 
 sub abstract { 'creates servers' }
 
@@ -20,7 +21,7 @@ sub opt_spec {
     [ 'flavorid|f=i',   'specify the ID of the flavor used to create the server' ],
     [ 'flavorname|F=s', 'specify the name of the flavor used to create the server' ],
     [ 'metadata|m=s%', 'specify max 5 255B string metadata keys/values', { default => {} } ],
-    [ 'path|p=s%',   'specify max 5 10kB max files to be pushed to the server', { default => {} } ],
+    [ 'path|p=s@',   'specify max 5 10kB max local:remote files to be pushed to the server', { default => {} } ],
     [ 'groupid|g=s', 'specify shared ip group ID for server',                   { default => '' } ],
     [ 'user', 'specify cloudservers API user, instead of $ENV{CLOUDSERVERS_USER}' ],
     [ 'key',  'specify cloudservers API key, instead of $ENV{CLOUDSERVERS_KEY}' ],
@@ -66,16 +67,20 @@ sub validate_args {
   }
   say "Metadata: ", join( "\n", map { '  - ' . $_ } keys %{ $opt->{metadata} } )
     if ( $opt->{verbose} );
-  if ( keys %{ $opt->{path} } > 5 ) {
-    $self->usage_error("You can only specify a maximum of 5 --path key/filename pairs\n");
+  if ( @{ $opt->{path} } > 5 ) {
+    $self->usage_error("You can only specify a maximum of 5 --path local:remote pairs\n");
   }
-  foreach my $f ( keys %{ $opt->{path} } ) {
-    $self->usage_error("$f: path names can only be 255B maximum in length\n")
-      if ( length $f > 255 );
-    $self->usage_error("$f: file $opt->{path}->{$f} does not exist\n")
-      unless ( -f $opt->{path}->{$f} );
-    $self->usage_error("$f: file size of file $opt->{path}->{$f} > 10kB\n")
-      unless ( -s $opt->{path}->{$f} <= 10_000 );
+  my @personality;
+  foreach my $f ( @{ $opt->{path} } ) {
+    my ($local,$remote) = split(':', $f);
+    $self->usage_error("$f: no remote path specified: Usage: localfilename:remotefilename\n")
+      if !defined $remote or !length $remote;
+    $self->usage_error("$f: remote path names can only be 255B maximum in length\n")
+      if ( length $remote > 255 );
+    $self->usage_error("$f: local file $local does not exist\n")
+      unless ( -f $local );
+    $self->usage_error("$f: file size of local file $local > 10kB\n")
+      unless ( -s $local <= 10_000 );
   }
   say "Paths: ", join( "\n", map { '  - ' . $_ } keys %{ $opt->{path} } ) if ( $opt->{verbose} );
   $opt->{user} //= $ENV{CLOUDSERVERS_USER};
@@ -132,6 +137,22 @@ sub run {
   my $CS      = $opt->{__RACKSPACE_CLOUDSERVERS};
   my @images  = @{ $opt->{__RACKSPACE_CLOUDSERVERS_IMAGES} };
   my @flavors = @{ $opt->{__RACKSPACE_CLOUDSERVERS_FLAVORS} };
+
+  my @personality;
+  foreach my $f ( @{ $opt->{path} || [] } ) {
+    my ($local,$remote) = split(':', $f);
+    my $data = do {
+        local $/ = undef;
+        open my $fh, '<', $local or die "Cannot open $local: $!";
+        my $_data = <$fh>;
+        close $fh or die "Canno close $local: $!";
+        $_data;
+    };
+    push @personality, {
+      path     => $remote,
+      contents => encode_base64($data),
+    };
+  }
   say "Creating new server..." if ( $opt->{verbose} );
   my $newserver;
   {
@@ -140,6 +161,7 @@ sub run {
       name         => $opt->{name},
       flavorid     => $opt->{flavorid},
       imageid      => $opt->{imageid},
+      (@personality ? (personality => \@personality) : ()),
     );
     $newserver = $tmp->create_server();
   }
