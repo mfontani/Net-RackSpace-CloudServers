@@ -10,6 +10,7 @@ use LWP::ConnCache::MaxKeepAliveRequests;
 use LWP::UserAgent::Determined;
 use JSON;
 use YAML;
+use Carp;
 use 5.010_000;
 
 our $DEBUG = 0;

@@ -6,6 +6,7 @@ use Any::Moose;
 use HTTP::Request;
 use JSON;
 use YAML;
+use Carp;
 
 has 'cloudservers' => ( is => 'rw', isa => 'Net::RackSpace::CloudServers', required => 1 );
 has 'totalramsize' => ( is => 'rw', isa => 'Int', );

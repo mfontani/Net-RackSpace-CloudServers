@@ -2,6 +2,7 @@ package Net::RackSpace::CloudServers::Flavor;
 use warnings;
 use strict;
 use Any::Moose;
+use Carp;
 
 has 'cloudservers' => ( is => 'rw', isa => 'Net::RackSpace::CloudServers', required => 1 );
 has 'id'           => ( is => 'ro', isa => 'Int',                          required => 1 );

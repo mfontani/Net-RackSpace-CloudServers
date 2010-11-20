@@ -7,6 +7,7 @@ use HTTP::Request;
 use JSON;
 use YAML;
 use Net::RackSpace::CloudServers::Image;
+use Carp;
 
 has 'cloudservers' => ( is => 'rw', isa => 'Net::RackSpace::CloudServers', required => 1 );
 has 'id'       => ( is => 'ro', isa => 'Int',        required => 1, default => 0 );
