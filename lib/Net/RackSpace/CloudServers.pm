@@ -81,7 +81,7 @@ sub _authenticate {
   );
   my $response = $self->_request($request);
   confess 'Unauthorized' if $response->code == 401;
-  confess 'Unknown error ' . $response->code if $response->code != 204;
+  confess 'Unknown error ' . $response->code . "\n" . $response->content if $response->code != 204;
 
   my $server_management_url = $response->header('X-Server-Management-Url')
     || confess 'Missing server management url';
