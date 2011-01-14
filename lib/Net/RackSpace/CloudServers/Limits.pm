@@ -31,7 +31,8 @@ sub refresh {
   );
   my $response = $self->cloudservers->_request($request);
   return if $response->code == 204;
-  confess 'Unknown error ' . $response->code unless ( $response->code ~~ [ 200, 203 ] );
+  confess 'Unknown error ' . $response->code
+    unless scalar grep { $response->code eq $_ } (200, 203);
   my $hr = from_json( $response->content );
   warn Dump($hr) if $DEBUG;
 
