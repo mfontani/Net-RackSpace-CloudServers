@@ -1,5 +1,8 @@
 Revision history for Net-RackSpace-CloudServers
 
+0.13 2011-01-31
+    Stable release; tests pass on older Perl versions
+
 0.12_01 2011-01-14 1930 GMT
     Developer release
     Tests should pass on Perl 5.8.8
