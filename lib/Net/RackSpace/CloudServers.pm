@@ -1,9 +1,8 @@
 package Net::RackSpace::CloudServers;
 use warnings;
 use strict;
-use Any::Moose (
-  '::Util::TypeConstraints' => ['subtype'],
-);
+use Any::Moose;
+use Any::Moose ( '::Util::TypeConstraints' );
 use Net::RackSpace::CloudServers::Flavor;
 use Net::RackSpace::CloudServers::Server;
 use Net::RackSpace::CloudServers::Image;
@@ -22,7 +21,7 @@ has 'timeout' => ( is => 'ro', isa => 'Num',            required => 0, default =
 has 'ua'      => ( is => 'rw', isa => 'LWP::UserAgent', required => 0 );
 
 # This module currently supports only US and UK
-subtype ValidLocation => as Str => where { $_ eq 'US' or $_ eq 'UK' };
+subtype ValidLocation => as 'Str' => where { $_ eq 'US' or $_ eq 'UK' };
 
 # The two locations have different API endpoints
 our %api_endpoint_by_location = (
