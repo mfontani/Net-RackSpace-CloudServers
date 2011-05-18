@@ -1,5 +1,8 @@
 Revision history for Net-RackSpace-CloudServers
 
+0.14 2011-05-18
+    Allows the user to choose either the US or UK endpoints
+
 0.13 2011-01-31
     Stable release; tests pass on older Perl versions
 
