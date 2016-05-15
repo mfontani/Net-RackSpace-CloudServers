@@ -192,9 +192,9 @@ Net::RackSpace::CloudServers::Server - a RackSpace CloudServers Server instance
   }
 
   ## Create server from template
-  my $tmp = Net::Rackspace::CloudServer::Server->new(
+  my $tmp = Net::RackSpace::CloudServer::Server->new(
     cloudservers => $cs, name => 'myserver',
-    flavor => 2, image => 8,
+    flavorid => 2, imageid => 8,
     # others
   );
   my $srv = $tmp->create_server;
