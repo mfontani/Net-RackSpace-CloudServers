@@ -63,6 +63,10 @@ sub refresh {
   return $self;
 }
 
+1;
+
+__END__
+
 =head1 NAME
 
 Net::RackSpace::CloudServers::Limits - a RackSpace CloudServers Limits instance
@@ -170,5 +174,3 @@ This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-
-1;    # End of Net::RackSpace::CloudServers::Limits

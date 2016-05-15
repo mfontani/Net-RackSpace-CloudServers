@@ -14,6 +14,10 @@ has 'disk'         => ( is => 'ro', isa => 'Maybe[Int]',                   requi
 no Any::Moose;
 __PACKAGE__->meta->make_immutable();
 
+1;
+
+__END__
+
 =head1 NAME
 
 Net::RackSpace::CloudServers::Flavor - a RackSpace CloudServers Flavor
@@ -116,5 +120,3 @@ This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-
-1;    # End of Net::RackSpace::CloudServers::Flavor

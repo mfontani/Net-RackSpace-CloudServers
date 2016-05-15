@@ -367,6 +367,10 @@ sub delete_image {
   return;
 }
 
+1;
+
+__END__
+
 =encoding utf-8
 
 =head1 NAME
@@ -518,5 +522,3 @@ This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-
-1;    # End of Net::RackSpace::CloudServers

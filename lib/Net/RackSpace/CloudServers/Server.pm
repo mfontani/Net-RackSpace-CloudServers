@@ -166,6 +166,10 @@ sub create_server {
   );
 }
 
+1;
+
+__END__
+
 =head1 NAME
 
 Net::RackSpace::CloudServers::Server - a RackSpace CloudServers Server instance
@@ -336,5 +340,3 @@ This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-
-1;    # End of Net::RackSpace::CloudServers::Server
