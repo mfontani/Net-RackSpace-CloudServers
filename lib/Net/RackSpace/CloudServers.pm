@@ -367,6 +367,8 @@ sub delete_image {
   return;
 }
 
+=encoding utf-8
+
 =head1 NAME
 
 Net::RackSpace::CloudServers - Interface to RackSpace CloudServers via API
