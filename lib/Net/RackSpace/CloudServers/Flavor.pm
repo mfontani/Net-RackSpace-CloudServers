@@ -1,4 +1,5 @@
 package Net::RackSpace::CloudServers::Flavor;
+
 use warnings;
 use strict;
 use Any::Moose;
