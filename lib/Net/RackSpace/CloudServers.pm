@@ -170,6 +170,8 @@ sub get_server {
     ? ( defined $id ? '/servers/' . $id : '/servers/detail' )
     : ( defined $id ? '/servers/' . $id : '/servers' )
   );
+  # cache-bust
+  $uri .= sprintf '?test=%s.%s', time, rand;
   my $request = HTTP::Request->new(
     'GET',
     $self->server_management_url . $uri,
