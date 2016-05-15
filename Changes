@@ -1,5 +1,10 @@
 Revision history for Net-RackSpace-CloudServers
 
+0.15 2016-05-15
+    use cache-bust uri for get_server
+    fix pod encoding
+    fix ::Server SYNOPSIS
+
 0.14 2011-05-18
     Allows the user to choose either the US or UK endpoints
 
